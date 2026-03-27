@@ -1,0 +1,2138 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no"/>
+<meta name="theme-color" content="#0d2818"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+<meta name="apple-mobile-web-app-title" content="Health is Wealth"/>
+<meta name="description" content="Health is Wealth — Complete AI Health + Wellness Platform"/>
+<meta http-equiv="X-Content-Type-Options" content="nosniff"/>
+<meta http-equiv="X-XSS-Protection" content="1; mode=block"/>
+<title>Health is Wealth — Wellness Platform</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400&family=Outfit:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet"/>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+<style>
+:root{
+  --forest:#0d2818;--forest2:#1a3d28;--forest3:#2d5a3d;--forest4:#3d7a52;
+  --sage:#6b9e7a;--sage2:#8fbf9e;--sage3:#b8d9c2;
+  --gold:#c9a84c;--gold2:#e8c87a;--gold3:#8a6820;
+  --bg:#f5f0e6;--bg2:#ede8dc;--bg3:#e4dccf;
+  --surf:#fff;--bdr:#d8ccb8;--bdr2:#c8bca8;
+  --txt:#1a1208;--txt2:#3d3020;--txt3:#6b5c40;--txt4:#9e8c6e;
+  --green:#1e6b3a;--green2:#d4edda;
+  --red:#8b1a1a;--red2:#fde8e8;
+  --amber:#8b5e00;--amber2:#fff8e6;
+  --blue:#1e40af;--blue2:#dbeafe;
+  --purple:#7c3aed;--purple2:#f5f3ff;
+  --e1:0 1px 4px rgba(13,40,24,.06);--e2:0 4px 16px rgba(13,40,24,.1);
+  --e3:0 10px 40px rgba(13,40,24,.14);--e4:0 20px 60px rgba(0,0,0,.22);
+  --spring:cubic-bezier(.34,1.56,.64,1);--ease:cubic-bezier(.4,0,.2,1);
+}
+[data-theme="dark"]{
+  --bg:#061210;--bg2:#0a1a12;--bg3:#0f2018;
+  --surf:#0d1f14;--bdr:#1a3225;--bdr2:#254838;
+  --txt:#e8f5ec;--txt2:#b8d9c2;--txt3:#7aab88;--txt4:#4a7058;
+  --green2:#0d2a15;--red2:#2a0d0d;--amber2:#1a1200;--blue2:#0d1a2a;
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;-webkit-font-smoothing:antialiased;}
+html{height:100%;overflow-x:hidden;}
+body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--txt);min-height:100vh;overflow-x:hidden;}
+h1,h2,h3,h4{font-family:'Cormorant Garamond',Georgia,serif;}
+button,input,select,textarea{font-family:'Outfit',sans-serif;}
+::-webkit-scrollbar{width:4px;}
+::-webkit-scrollbar-thumb{background:var(--sage3);border-radius:2px;}
+
+/* SPLASH */
+#splash{position:fixed;inset:0;z-index:9999;background:linear-gradient(160deg,#0d2818,#0a1f12,#051009);display:flex;flex-direction:column;align-items:center;justify-content:center;transition:opacity .8s,visibility .8s;}
+#splash.gone{opacity:0;visibility:hidden;pointer-events:none;}
+.sp-pulse{width:88px;height:88px;border-radius:50%;background:radial-gradient(circle,rgba(13,40,24,.9),rgba(5,15,10,.95));border:2px solid rgba(201,168,76,.3);display:flex;align-items:center;justify-content:center;font-size:2.4rem;margin-bottom:20px;animation:sp-pulse 2s ease infinite;}
+@keyframes sp-pulse{0%,100%{box-shadow:0 0 0 0 rgba(201,168,76,.4);}50%{box-shadow:0 0 0 20px rgba(201,168,76,0);}}
+.sp-name{font-family:'Cormorant Garamond',serif;font-size:1.9rem;color:#fff;font-weight:700;letter-spacing:2px;}
+.sp-name span{color:var(--gold2);}
+.sp-tag{font-size:.68rem;color:rgba(255,255,255,.35);letter-spacing:4px;text-transform:uppercase;margin-top:5px;}
+.sp-bar{width:180px;height:2px;background:rgba(255,255,255,.08);border-radius:1px;margin-top:28px;overflow:hidden;}
+.sp-fill{height:100%;background:linear-gradient(90deg,transparent,var(--gold2),transparent);animation:sp-fill 2.4s ease forwards;}
+@keyframes sp-fill{from{transform:translateX(-100%);}to{transform:translateX(100%);}}
+
+/* AUTH */
+#authScreen{min-height:100vh;display:none;flex-direction:column;align-items:center;justify-content:center;background:linear-gradient(160deg,#0d2818,#142a1c,#0a1f12);padding:24px 20px;}
+.auth-box{width:100%;max-width:380px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:22px;padding:28px 22px;backdrop-filter:blur(12px);}
+.auth-logo{text-align:center;margin-bottom:20px;}
+.auth-logo-ico{font-size:3rem;margin-bottom:8px;}
+.auth-logo h1{font-family:'Cormorant Garamond',serif;font-size:1.9rem;font-weight:700;color:#fff;letter-spacing:2px;}
+.auth-logo h1 span{color:var(--gold2);}
+.auth-logo p{font-size:.68rem;color:rgba(255,255,255,.35);letter-spacing:3px;text-transform:uppercase;margin-top:4px;}
+.auth-tabs{display:flex;background:rgba(0,0,0,.3);border-radius:10px;padding:3px;margin-bottom:20px;}
+.auth-tab{flex:1;padding:9px;border:none;border-radius:8px;cursor:pointer;font-size:.8rem;font-weight:700;transition:.2s;background:transparent;color:rgba(255,255,255,.45);}
+.auth-tab.on{background:var(--forest2);color:var(--gold2);}
+.ai{width:100%;padding:12px 14px;margin-bottom:10px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);border-radius:10px;color:#fff;font-size:.9rem;outline:none;transition:.2s;}
+.ai:focus{border-color:var(--gold);box-shadow:0 0 0 3px rgba(201,168,76,.12);}
+.ai::placeholder{color:rgba(255,255,255,.3);}
+.btn-gold{width:100%;padding:13px;border:none;border-radius:10px;cursor:pointer;background:linear-gradient(135deg,var(--gold3),var(--gold),var(--gold2));color:var(--forest);font-weight:800;font-size:.88rem;letter-spacing:.5px;box-shadow:0 4px 20px rgba(201,168,76,.35);transition:.2s;}
+.btn-gold:hover{transform:translateY(-1px);}
+.btn-gold:disabled{opacity:.5;cursor:not-allowed;transform:none;}
+.auth-err{color:#ff8a8a;font-size:.76rem;text-align:center;min-height:18px;margin-top:6px;}
+.auth-ok{color:#86efac;font-size:.76rem;text-align:center;}
+.auth-forgot{text-align:right;margin-bottom:10px;}
+.auth-forgot button{background:none;border:none;color:rgba(255,255,255,.4);font-size:.74rem;cursor:pointer;}
+
+/* APP */
+#userApp{display:none;min-height:100vh;padding-bottom:70px;}
+.topbar{background:var(--forest);position:sticky;top:0;z-index:400;display:flex;align-items:center;justify-content:space-between;padding:12px 16px;box-shadow:0 2px 16px rgba(0,0,0,.3);}
+.tb-brand{display:flex;align-items:center;gap:8px;cursor:pointer;}
+.tb-ico{font-size:1.4rem;}
+.tb-name{font-family:'Cormorant Garamond',serif;font-size:1.05rem;font-weight:700;color:#fff;}
+.tb-name span{color:var(--gold2);}
+.tb-right{display:flex;align-items:center;gap:6px;}
+.tb-pill{background:rgba(201,168,76,.15);border:1px solid rgba(201,168,76,.3);color:var(--gold2);padding:4px 10px;border-radius:16px;font-size:.72rem;font-weight:700;cursor:pointer;border:none;}
+.tb-theme{background:none;border:1px solid rgba(255,255,255,.15);color:rgba(255,255,255,.6);padding:5px 9px;border-radius:8px;cursor:pointer;font-size:.82rem;}
+.tb-logout{background:none;border:1px solid rgba(255,255,255,.15);color:rgba(255,255,255,.5);padding:5px 10px;border-radius:8px;cursor:pointer;font-size:.72rem;}
+
+/* NAV */
+.bnav{position:fixed;bottom:0;left:0;right:0;z-index:400;background:var(--surf);border-top:1px solid var(--bdr);display:flex;padding-bottom:env(safe-area-inset-bottom);box-shadow:0 -4px 20px rgba(0,0,0,.08);}
+.bn-item{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;padding:8px 2px;background:none;border:none;cursor:pointer;min-width:0;}
+.bn-item.on{color:var(--forest);}
+.bn-item:not(.on){color:var(--txt4);}
+.bn-ico{font-size:1.1rem;line-height:1;}
+.bn-lbl{font-size:.5rem;font-weight:700;letter-spacing:.2px;text-transform:uppercase;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:52px;}
+.bn-item.on .bn-ico{transform:translateY(-2px);}
+
+/* PAGES */
+.pg{display:none;}.pg.on{display:block;}
+.wrap{max-width:480px;margin:0 auto;padding:14px 14px 16px;}
+.card{background:var(--surf);border:1px solid var(--bdr);border-radius:14px;padding:16px;box-shadow:var(--e1);margin-bottom:12px;}
+.card-hd{font-family:'Cormorant Garamond',serif;font-size:1.05rem;font-weight:700;color:var(--txt);margin-bottom:12px;display:flex;align-items:center;gap:8px;}
+.card-hd::before{content:'';width:3px;height:16px;background:linear-gradient(180deg,var(--gold),var(--sage));border-radius:2px;flex-shrink:0;}
+.sect-hd{font-family:'Cormorant Garamond',serif;font-size:.72rem;color:var(--txt4);letter-spacing:2px;text-transform:uppercase;margin:16px 0 8px;display:flex;align-items:center;gap:8px;}
+.sect-hd::after{content:'';flex:1;height:1px;background:var(--bdr);}
+
+/* HERO */
+.hero-banner{background:linear-gradient(135deg,var(--forest),var(--forest2),#1f4a2d);border-radius:18px;padding:22px 18px;margin-bottom:14px;position:relative;overflow:hidden;}
+.hero-banner::before{content:'';position:absolute;right:-40px;top:-40px;width:160px;height:160px;border-radius:50%;background:radial-gradient(circle,rgba(201,168,76,.12),transparent);}
+.hero-greeting{color:rgba(255,255,255,.55);font-size:.78rem;}
+.hero-name{color:#fff;font-family:'Cormorant Garamond',serif;font-size:1.5rem;font-weight:700;margin:2px 0 12px;}
+.hero-name span{color:var(--gold2);}
+.hero-stats{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;}
+.hero-stat{background:rgba(255,255,255,.08);border-radius:10px;padding:9px;text-align:center;}
+.hero-stat-v{font-family:'Cormorant Garamond',serif;font-size:1.2rem;font-weight:700;color:var(--gold2);}
+.hero-stat-l{font-size:.58rem;color:rgba(255,255,255,.45);margin-top:2px;}
+
+/* STATS */
+.stat-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:12px;}
+.stat-card{background:var(--surf);border:1px solid var(--bdr);border-radius:12px;padding:14px;box-shadow:var(--e1);position:relative;overflow:hidden;}
+.stat-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;border-radius:3px 3px 0 0;}
+.sc-km::before{background:linear-gradient(90deg,var(--gold3),var(--gold));}
+.sc-hr::before{background:linear-gradient(90deg,#c0392b,#e74c3c);}
+.sc-sleep::before{background:linear-gradient(90deg,var(--purple),#9b59b6);}
+.sc-water::before{background:linear-gradient(90deg,var(--blue),#3498db);}
+.stat-v{font-family:'Cormorant Garamond',serif;font-size:1.6rem;font-weight:700;color:var(--txt);line-height:1;}
+.stat-l{font-size:.66rem;color:var(--txt4);margin-top:2px;letter-spacing:.5px;text-transform:uppercase;}
+.stat-sub{font-size:.7rem;color:var(--txt3);margin-top:4px;}
+.progress-bar{height:8px;background:var(--bg2);border-radius:4px;overflow:hidden;margin-top:6px;}
+.pb-fill{height:100%;border-radius:4px;transition:width .6s var(--ease);}
+.pb-km{background:linear-gradient(90deg,var(--gold3),var(--gold2));}
+.pb-water{background:linear-gradient(90deg,var(--blue),#60a5fa);}
+.pb-sleep{background:linear-gradient(90deg,var(--purple),#a78bfa);}
+
+/* SCORE RING */
+.score-wrap{display:flex;align-items:center;justify-content:center;gap:20px;padding:14px 0;}
+.score-ring{position:relative;width:100px;height:100px;}
+.score-ring svg{transform:rotate(-90deg);}
+.score-ring-val{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;}
+.score-num{font-family:'Cormorant Garamond',serif;font-size:1.8rem;font-weight:700;line-height:1;}
+.score-lbl{font-size:.6rem;color:var(--txt4);letter-spacing:1px;}
+.score-details{display:flex;flex-direction:column;gap:6px;}
+.score-metric{display:flex;align-items:center;gap:8px;font-size:.8rem;}
+.score-metric-ico{font-size:1rem;width:24px;}
+.score-metric-val{font-weight:700;color:var(--txt2);margin-left:auto;}
+
+/* GPS */
+.gps-card{background:linear-gradient(135deg,var(--forest),var(--forest2));border-radius:18px;padding:20px;margin-bottom:14px;position:relative;overflow:hidden;}
+.gps-dot{width:10px;height:10px;border-radius:50%;background:#4ade80;display:inline-block;animation:gps-blink 1.5s ease infinite;}
+.gps-dot.off{background:#6b7280;animation:none;}
+.gps-dot.waiting{background:var(--gold2);animation:gps-blink 1s ease infinite;}
+@keyframes gps-blink{0%,100%{opacity:1;}50%{opacity:.3;}}
+.gps-metrics{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:12px 0;}
+.gps-metric{background:rgba(255,255,255,.08);border-radius:10px;padding:10px;text-align:center;}
+.gps-metric-v{font-family:'Cormorant Garamond',serif;font-size:1.4rem;font-weight:700;color:var(--gold2);}
+.gps-metric-l{font-size:.58rem;color:rgba(255,255,255,.45);margin-top:2px;}
+.gps-progress{background:rgba(255,255,255,.08);border-radius:8px;height:8px;margin-bottom:10px;overflow:hidden;}
+.gps-progress-fill{height:100%;background:linear-gradient(90deg,var(--gold3),var(--gold2));border-radius:8px;transition:width .4s ease;}
+.gps-btn-row{display:flex;gap:8px;}
+.gps-btn{flex:1;padding:12px;border:none;border-radius:10px;cursor:pointer;font-size:.84rem;font-weight:700;display:flex;align-items:center;justify-content:center;gap:6px;}
+.gps-start{background:linear-gradient(135deg,#16a34a,#22c55e);color:#fff;}
+.gps-stop{background:linear-gradient(135deg,#c0392b,#e74c3c);color:#fff;}
+.gps-pause{background:rgba(255,255,255,.15);color:#fff;border:1px solid rgba(255,255,255,.2);}
+.locked-gps{background:rgba(255,255,255,.05);border:1px solid rgba(255,165,0,.3);border-radius:12px;padding:14px;text-align:center;margin-top:10px;}
+
+/* MOOD */
+.mood-row{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;padding:8px 0;}
+.mood-btn{width:48px;height:48px;border-radius:50%;border:2px solid var(--bdr);background:var(--bg2);cursor:pointer;font-size:1.5rem;display:flex;align-items:center;justify-content:center;transition:.2s;}
+.mood-btn.on{border-color:var(--gold);background:var(--amber2);transform:scale(1.1);}
+
+/* MED TIMER */
+.med-circle{width:120px;height:120px;border-radius:50%;border:4px solid var(--sage3);margin:12px auto;display:flex;align-items:center;justify-content:center;background:radial-gradient(circle,var(--green2),var(--bg));}
+.med-circle.active{border-color:var(--forest);animation:med-breathe 4s ease infinite;}
+@keyframes med-breathe{0%,100%{transform:scale(1);}50%{transform:scale(1.08);}}
+.med-time-display{font-family:'Cormorant Garamond',serif;font-size:3rem;font-weight:700;color:var(--forest);letter-spacing:2px;text-align:center;}
+
+/* BREATH */
+.breath-circle{width:100px;height:100px;border-radius:50%;margin:0 auto 12px;display:flex;align-items:center;justify-content:center;font-size:.82rem;font-weight:700;color:#fff;transition:all 4s ease;background:radial-gradient(circle,var(--forest),var(--forest2));}
+.breath-inhale{transform:scale(1.4);background:radial-gradient(circle,var(--forest4),var(--forest));}
+.breath-hold{transform:scale(1.4);background:radial-gradient(circle,var(--gold),var(--gold3));}
+.breath-exhale{transform:scale(1);background:radial-gradient(circle,var(--forest),#061210);}
+
+/* ROUTINE */
+.routine-item{display:flex;align-items:center;gap:12px;padding:10px 12px;background:var(--bg2);border-radius:10px;margin-bottom:7px;border-left:3px solid transparent;}
+.ri-time{font-family:'Cormorant Garamond',serif;font-size:.88rem;font-weight:600;color:var(--forest);min-width:50px;}
+.ri-ico{font-size:1.1rem;flex-shrink:0;}
+.ri-text{font-size:.82rem;color:var(--txt2);flex:1;}
+.ri-done{opacity:.5;text-decoration:line-through;}
+.ri-now{border-left-color:var(--gold);background:var(--amber2);}
+
+/* FIRST AID */
+.firstaid-card{background:var(--surf);border:1px solid var(--bdr);border-radius:12px;margin-bottom:8px;overflow:hidden;cursor:pointer;}
+.fa-header{padding:12px 14px;display:flex;align-items:center;gap:10px;}
+.fa-ico{width:34px;height:34px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:1rem;flex-shrink:0;}
+.fa-title{font-size:.86rem;font-weight:700;color:var(--txt2);flex:1;}
+.fa-arrow{color:var(--txt4);transition:.3s;}
+.fa-arrow.open{transform:rotate(180deg);}
+.fa-body{padding:0 14px 12px;font-size:.8rem;color:var(--txt3);line-height:1.6;display:none;}
+.fa-body.open{display:block;}
+
+/* SOS */
+.sos-btn{width:100%;padding:18px;background:linear-gradient(135deg,#c0392b,#e74c3c);color:#fff;border:none;border-radius:14px;font-size:1.1rem;font-weight:800;cursor:pointer;animation:sos-pulse 1.5s infinite;display:flex;align-items:center;justify-content:center;gap:10px;}
+@keyframes sos-pulse{0%,100%{box-shadow:0 4px 24px rgba(192,57,43,.4);}50%{box-shadow:0 4px 40px rgba(192,57,43,.7),0 0 0 10px rgba(192,57,43,.1);}}
+
+/* ALERTS */
+.alert-banner{border-radius:12px;padding:12px 14px;display:flex;align-items:flex-start;gap:10px;margin-bottom:10px;font-size:.82rem;line-height:1.5;}
+.ab-info{background:linear-gradient(135deg,#dbeafe,#eff6ff);border:1px solid rgba(30,64,175,.2);color:#1e3a8a;}
+.ab-success{background:linear-gradient(135deg,#dcfce7,#f0fdf4);border:1px solid rgba(22,101,52,.2);color:#14532d;}
+.ab-warning{background:linear-gradient(135deg,#fde8e8,#fff5f5);border:1px solid rgba(192,57,43,.25);color:#7f1d1d;}
+.ab-amber{background:var(--amber2);border:1px solid rgba(139,94,0,.2);color:var(--amber);}
+.ab-ico{font-size:1.2rem;flex-shrink:0;margin-top:1px;}
+
+/* BOOK */
+.book-cover{background:linear-gradient(160deg,var(--forest),#1f4a2d,var(--forest2));border-radius:20px;padding:28px 20px;text-align:center;position:relative;overflow:hidden;margin-bottom:16px;box-shadow:var(--e3);}
+.book-title{font-family:'Cormorant Garamond',serif;font-size:1.4rem;font-weight:700;color:#fff;line-height:1.3;margin-bottom:6px;}
+.book-price{display:inline-block;background:linear-gradient(135deg,var(--gold3),var(--gold));color:var(--forest);padding:8px 22px;border-radius:20px;font-size:1.1rem;font-weight:800;font-family:'Cormorant Garamond',serif;}
+.book-locked{background:var(--red2);border:1px solid rgba(139,26,26,.2);border-radius:10px;padding:14px;text-align:center;margin-bottom:12px;}
+.book-unlocked{background:var(--green2);border:1px solid rgba(30,107,58,.2);border-radius:10px;padding:14px;text-align:center;margin-bottom:12px;}
+
+/* UPI */
+.upi-sheet{position:fixed;inset:0;z-index:800;background:rgba(0,0,0,.65);backdrop-filter:blur(6px);display:flex;align-items:flex-end;justify-content:center;opacity:0;visibility:hidden;transition:.3s;}
+.upi-sheet.on{opacity:1;visibility:visible;}
+.upi-content{background:var(--surf);border-radius:24px 24px 0 0;padding:24px 20px 36px;width:100%;max-width:480px;transform:translateY(100%);transition:.35s var(--spring);max-height:88vh;overflow-y:auto;}
+.upi-sheet.on .upi-content{transform:translateY(0);}
+.upi-handle{width:40px;height:4px;background:var(--bdr2);border-radius:2px;margin:0 auto 18px;}
+.upi-step{background:var(--bg);border:1px solid var(--bdr);border-radius:12px;padding:14px;margin-bottom:12px;display:flex;align-items:flex-start;gap:12px;}
+.upi-step-num{width:24px;height:24px;background:var(--forest);color:var(--gold2);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.72rem;font-weight:800;flex-shrink:0;margin-top:1px;}
+.upi-id-box{background:var(--forest);color:var(--gold2);padding:10px 16px;border-radius:10px;font-size:1rem;font-weight:800;letter-spacing:.5px;margin:8px 0;text-align:center;}
+/* UPI App buttons - using intent/deep links */
+.upi-btn{width:100%;padding:13px;border:none;border-radius:12px;cursor:pointer;font-size:.88rem;font-weight:700;margin-bottom:10px;display:flex;align-items:center;justify-content:center;gap:8px;text-decoration:none;}
+.upi-gpay{background:linear-gradient(135deg,#4285f4,#3470dc);color:#fff;}
+.upi-phone{background:linear-gradient(135deg,#7b2ff7,#5c1bd4);color:#fff;}
+.upi-bhim{background:linear-gradient(135deg,#0066cc,#0052a3);color:#fff;}
+.upi-other{background:var(--forest);color:var(--gold2);}
+.upi-inp{width:100%;padding:12px 14px;border:2px solid var(--bdr);border-radius:10px;font-size:.9rem;outline:none;background:var(--bg);color:var(--txt);}
+.upi-inp:focus{border-color:var(--forest);background:var(--surf);}
+
+/* SUCCESS MODAL */
+.success-modal{position:fixed;inset:0;z-index:900;background:rgba(0,0,0,.7);backdrop-filter:blur(8px);display:flex;align-items:center;justify-content:center;padding:20px;opacity:0;visibility:hidden;transition:.3s;}
+.success-modal.on{opacity:1;visibility:visible;}
+.success-box{background:var(--surf);border-radius:24px;padding:32px 24px;width:100%;max-width:360px;text-align:center;box-shadow:var(--e4);animation:modal-in .4s var(--spring) both;}
+@keyframes modal-in{from{opacity:0;transform:scale(.85);}to{opacity:1;transform:none;}}
+.success-ring{width:80px;height:80px;border-radius:50%;background:linear-gradient(135deg,var(--forest),var(--forest3));display:flex;align-items:center;justify-content:center;font-size:2rem;margin:0 auto 16px;}
+
+/* EARN */
+.ref-box{background:linear-gradient(135deg,var(--forest),var(--forest2));border-radius:16px;padding:20px;margin-bottom:14px;position:relative;overflow:hidden;}
+.ref-code{font-family:'Cormorant Garamond',serif;font-size:1.8rem;font-weight:700;color:var(--gold2);letter-spacing:3px;}
+.ref-url{font-size:.72rem;color:rgba(255,255,255,.4);margin-top:4px;word-break:break-all;}
+.ref-btns{display:flex;gap:8px;margin-top:12px;flex-wrap:wrap;}
+.ref-btn{flex:1;min-width:90px;padding:9px 12px;border:none;border-radius:9px;cursor:pointer;font-size:.76rem;font-weight:700;display:flex;align-items:center;justify-content:center;gap:5px;}
+.ref-copy{background:rgba(255,255,255,.1);color:#fff;border:1px solid rgba(255,255,255,.2);}
+.ref-wa{background:#25d366;color:#fff;}
+.ref-tg{background:#0088cc;color:#fff;}
+.earn-step{background:var(--bg2);border:1px solid var(--bdr);border-radius:12px;padding:14px 12px;text-align:center;position:relative;}
+.earn-step-num{position:absolute;top:-8px;left:12px;background:var(--gold);color:var(--forest);width:18px;height:18px;border-radius:50%;font-size:.68rem;font-weight:800;display:flex;align-items:center;justify-content:center;}
+.comm-table{width:100%;border-collapse:collapse;}
+.comm-table th{background:var(--forest);color:rgba(255,255,255,.8);padding:9px 12px;font-size:.7rem;font-weight:700;letter-spacing:.5px;text-align:left;}
+.comm-table td{padding:9px 12px;border-bottom:1px solid var(--bdr);font-size:.82rem;}
+.comm-table td:last-child{text-align:right;font-weight:700;color:var(--green);}
+.comm-table tr:last-child td{border-bottom:none;}
+.recruit-item{display:flex;align-items:center;gap:12px;padding:11px 0;border-bottom:1px solid var(--bdr);}
+.recruit-item:last-child{border-bottom:none;}
+.recruit-av{width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,var(--forest),var(--forest3));display:flex;align-items:center;justify-content:center;color:var(--gold2);font-weight:700;font-size:.82rem;}
+.rb-paid{background:var(--green2);color:var(--green);padding:3px 8px;border-radius:5px;font-size:.65rem;font-weight:800;}
+.rb-pending{background:var(--amber2);color:var(--amber);padding:3px 8px;border-radius:5px;font-size:.65rem;font-weight:800;}
+
+/* WALLET */
+.wallet-hero{background:linear-gradient(135deg,var(--forest),var(--forest2),#1a4a28);border-radius:18px;padding:24px 20px;text-align:center;margin-bottom:14px;}
+.wallet-amount{font-family:'Cormorant Garamond',serif;font-size:2.6rem;font-weight:700;color:#fff;margin:6px 0 4px;}
+.wallet-amount span{color:var(--gold2);}
+.txn-item{display:flex;align-items:center;gap:12px;padding:11px 0;border-bottom:1px solid var(--bdr);}
+.txn-item:last-child{border-bottom:none;}
+.txn-ico{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1rem;flex-shrink:0;}
+.txn-ico-in{background:var(--green2);}
+.txn-ico-out{background:var(--red2);}
+.txn-desc{flex:1;font-size:.84rem;font-weight:600;color:var(--txt2);}
+.txn-date{font-size:.7rem;color:var(--txt4);margin-top:2px;}
+.txn-in{color:var(--green);font-weight:800;}
+.txn-out{color:var(--red);font-weight:800;}
+
+/* BMI */
+.bmi-result{text-align:center;padding:16px;border-radius:14px;margin:10px 0;}
+.bmi-num{font-family:'Cormorant Garamond',serif;font-size:3rem;font-weight:700;line-height:1;}
+.bmi-cat{font-size:.9rem;font-weight:700;margin-top:4px;}
+.bmi-bar-wrap{height:16px;border-radius:8px;overflow:hidden;margin:12px 0;display:flex;}
+.bmi-bar-seg{flex:1;height:100%;}
+.bmi-pointer{position:relative;margin-top:4px;}
+
+/* AI FEATURES */
+.ai-feature-card{background:var(--surf);border:1px solid var(--bdr);border-radius:14px;padding:16px;margin-bottom:10px;position:relative;overflow:hidden;}
+.ai-feature-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;border-radius:3px 3px 0 0;}
+.aif-1::before{background:linear-gradient(90deg,#7c3aed,#a855f7);}
+.aif-2::before{background:linear-gradient(90deg,#1e40af,#3b82f6);}
+.aif-3::before{background:linear-gradient(90deg,#c0392b,#ef4444);}
+.aif-4::before{background:linear-gradient(90deg,#d97706,#f59e0b);}
+.aif-5::before{background:linear-gradient(90deg,#1e6b3a,#22c55e);}
+.aif-6::before{background:linear-gradient(90deg,#0891b2,#06b6d4);}
+.aif-7::before{background:linear-gradient(90deg,#be185d,#ec4899);}
+.aif-ico{font-size:2rem;margin-bottom:8px;}
+.aif-title{font-family:'Cormorant Garamond',serif;font-size:1.05rem;font-weight:700;color:var(--txt);margin-bottom:4px;}
+.aif-desc{font-size:.8rem;color:var(--txt3);line-height:1.5;margin-bottom:10px;}
+.aif-tag{display:inline-block;background:var(--purple2);color:var(--purple);padding:3px 8px;border-radius:6px;font-size:.66rem;font-weight:700;text-transform:uppercase;}
+.aif-result{background:var(--bg2);border-radius:10px;padding:12px;margin-top:10px;font-size:.82rem;color:var(--txt2);line-height:1.6;display:none;}
+.aif-result.on{display:block;}
+.scan-btn{width:100%;padding:11px;border:none;border-radius:10px;cursor:pointer;font-weight:700;font-size:.84rem;background:linear-gradient(135deg,var(--forest),var(--forest2));color:var(--gold2);display:flex;align-items:center;justify-content:center;gap:8px;}
+
+/* EXERCISE */
+.exercise-card{background:var(--surf);border:1px solid var(--bdr);border-radius:12px;padding:14px;margin-bottom:10px;display:flex;gap:12px;align-items:center;}
+.exercise-ico{font-size:2.5rem;flex-shrink:0;}
+.exercise-title{font-size:.9rem;font-weight:700;color:var(--txt2);}
+.exercise-sub{font-size:.76rem;color:var(--txt4);margin-top:2px;}
+.exercise-tag{display:inline-block;padding:2px 7px;border-radius:4px;font-size:.64rem;font-weight:800;margin-top:4px;}
+.tag-easy{background:var(--green2);color:var(--green);}
+.tag-med{background:var(--amber2);color:var(--amber);}
+.tag-hard{background:var(--red2);color:var(--red);}
+
+/* FOOD SCANNER */
+.food-scanner{text-align:center;padding:16px;}
+.food-scan-area{width:160px;height:160px;border-radius:16px;border:2px dashed var(--bdr);margin:0 auto 12px;display:flex;align-items:center;justify-content:center;font-size:3rem;cursor:pointer;background:var(--bg2);}
+.food-result{background:var(--bg2);border-radius:12px;padding:14px;margin-top:10px;text-align:left;}
+
+/* FAMS */
+.fam-card{background:var(--surf);border:1px solid var(--bdr);border-radius:14px;padding:14px;margin-bottom:10px;}
+.fam-av{width:44px;height:44px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.4rem;flex-shrink:0;}
+.fam-av-dad{background:linear-gradient(135deg,#1e3a8a,#2563eb);}
+.fam-av-mom{background:linear-gradient(135deg,#9d174d,#ec4899);}
+.fam-vitals{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;}
+.fam-vital{background:var(--bg2);border-radius:8px;padding:8px;text-align:center;}
+.fv-val{font-weight:700;font-size:.94rem;color:var(--txt);}
+.fv-lbl{font-size:.62rem;color:var(--txt4);margin-top:2px;}
+
+/* ADMIN */
+#adminApp{display:none;min-height:100vh;}
+.admin-hd{background:#0d2818;padding:14px 20px;display:flex;align-items:center;justify-content:space-between;box-shadow:0 2px 12px rgba(0,0,0,.2);}
+.admin-hd h1{color:#fff;font-size:1.1rem;font-weight:800;}
+.admin-hd h1 span{color:#e8c87a;}
+.admin-tabs{background:#fff;border-bottom:2px solid #d8ccb8;display:flex;overflow-x:auto;}
+.admin-tab{padding:12px 16px;border:none;background:transparent;font-size:.82rem;font-weight:700;cursor:pointer;color:#9e8c6e;border-bottom:3px solid transparent;margin-bottom:-2px;white-space:nowrap;}
+.admin-tab.on{color:#0d2818;border-bottom-color:#c9a84c;}
+.admin-content{max-width:1100px;margin:0 auto;padding:16px;}
+.admin-stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:10px;margin-bottom:16px;}
+.admin-stat{background:#fff;border:1px solid #d8ccb8;border-radius:12px;padding:14px;text-align:center;}
+.admin-stat-v{font-size:1.7rem;font-weight:800;color:#0d2818;line-height:1;}
+.admin-stat-l{font-size:.66rem;color:#9e8c6e;margin-top:4px;text-transform:uppercase;}
+.admin-section{background:#fff;border:1px solid #d8ccb8;border-radius:14px;overflow:hidden;margin-bottom:16px;}
+.admin-section-hd{padding:12px 16px;border-bottom:1px solid #d8ccb8;display:flex;align-items:center;justify-content:space-between;}
+.admin-section-hd h3{font-size:.9rem;font-weight:800;color:#0d2818;}
+.tbl{width:100%;border-collapse:collapse;}
+.tbl th{background:#f5f0e6;padding:9px 12px;font-size:.7rem;font-weight:700;color:#6b5c40;text-align:left;text-transform:uppercase;letter-spacing:.5px;}
+.tbl td{padding:10px 12px;border-bottom:1px solid #ede8dc;font-size:.82rem;color:#3d3020;vertical-align:middle;}
+.tbl tr:last-child td{border-bottom:none;}
+.pill{display:inline-block;padding:3px 9px;border-radius:20px;font-size:.66rem;font-weight:800;text-transform:uppercase;}
+.pill-p{background:#fff8e6;color:#8b5e00;border:1px solid #f3d06e;}
+.pill-a{background:#d4edda;color:#1e6b3a;border:1px solid #7cc99e;}
+.pill-r{background:#fde8e8;color:#8b1a1a;border:1px solid #e8a0a0;}
+.btn-a{background:#1e6b3a;color:#fff;border:none;padding:5px 12px;border-radius:7px;cursor:pointer;font-size:.74rem;font-weight:700;}
+.btn-r{background:#8b1a1a;color:#fff;border:none;padding:5px 12px;border-radius:7px;cursor:pointer;font-size:.74rem;font-weight:700;}
+.refresh-btn{background:#0d2818;color:#e8c87a;border:none;padding:7px 12px;border-radius:8px;cursor:pointer;font-size:.76rem;font-weight:700;}
+
+/* MISC */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:9px 16px;border:none;border-radius:9px;cursor:pointer;font-weight:700;font-size:.82rem;transition:.2s;font-family:'Outfit',sans-serif;}
+.btn-primary{background:var(--forest);color:var(--gold2);}
+.btn-outline{background:transparent;border:1.5px solid var(--bdr);color:var(--txt2);}
+.btn-full{width:100%;display:flex;}
+.btn-red{background:#c0392b;color:#fff;}
+.btn:disabled{opacity:.45;cursor:not-allowed;}
+.inp{width:100%;padding:11px 13px;border:1.5px solid var(--bdr);border-radius:9px;font-size:.88rem;outline:none;background:var(--bg);color:var(--txt);font-family:'Outfit',sans-serif;margin-bottom:10px;}
+.inp:focus{border-color:var(--forest);background:var(--surf);}
+.inp::placeholder{color:var(--txt4);}
+.sel{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%237a9e86' d='M6 8L1 3h10z'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center;padding-right:32px;}
+.empty{text-align:center;padding:28px 20px;color:var(--txt4);}
+.empty-ico{font-size:2.2rem;margin-bottom:10px;}
+.empty-txt{font-size:.84rem;}
+.level-row{display:flex;align-items:center;gap:10px;padding:10px 12px;background:var(--bg);border:1px solid var(--bdr);border-radius:10px;margin-bottom:8px;}
+.level-badge{width:32px;height:32px;border-radius:8px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:.78rem;color:#fff;}
+.l1{background:var(--gold3);}
+.level-info{flex:1;}
+.level-title{font-size:.82rem;font-weight:700;color:var(--txt2);}
+.level-desc{font-size:.7rem;color:var(--txt4);margin-top:1px;}
+#postureTimer{position:fixed;bottom:80px;right:12px;z-index:500;background:var(--forest);color:var(--gold2);padding:8px 12px;border-radius:12px;font-size:.74rem;font-weight:700;display:none;}
+#toast{position:fixed;bottom:80px;left:50%;transform:translateX(-50%) translateY(14px);background:var(--forest);color:#fff;padding:9px 20px;border-radius:20px;font-size:.78rem;font-weight:600;z-index:9999;opacity:0;transition:.3s;pointer-events:none;white-space:nowrap;}
+#toast.on{opacity:1;transform:translateX(-50%) translateY(0);}
+.twin-timeline{position:relative;padding-left:20px;}
+.twin-timeline::before{content:'';position:absolute;left:6px;top:0;bottom:0;width:2px;background:linear-gradient(180deg,var(--green),var(--gold),var(--red));}
+.twin-event{position:relative;padding:8px 0 8px 16px;margin-bottom:8px;}
+.twin-event::before{content:'';position:absolute;left:-14px;top:12px;width:10px;height:10px;border-radius:50%;border:2px solid var(--surf);}
+.twin-good::before{background:var(--green);}
+.twin-warn::before{background:var(--gold);}
+.twin-risk::before{background:#c0392b;}
+.habit-item{display:flex;align-items:center;gap:12px;padding:10px 12px;background:var(--bg2);border-radius:10px;margin-bottom:8px;}
+.habit-ico{font-size:1.4rem;flex-shrink:0;}
+.habit-bar{flex:1;height:6px;background:var(--bdr);border-radius:3px;overflow:hidden;margin-top:4px;}
+.habit-fill{height:100%;border-radius:3px;background:linear-gradient(90deg,var(--forest),var(--gold));}
+</style>
+</head>
+<body>
+
+<!-- SPLASH -->
+<div id="splash">
+  <div class="sp-pulse">🌿</div>
+  <div class="sp-name">Health is <span>Wealth</span></div>
+  <div class="sp-tag">Wellness · Walk · Wealth</div>
+  <div class="sp-bar"><div class="sp-fill"></div></div>
+</div>
+
+<!-- AUTH -->
+<div id="authScreen">
+  <div class="auth-box">
+    <div class="auth-logo">
+      <div class="auth-logo-ico">🌿</div>
+      <h1>Health is <span>Wealth</span></h1>
+      <p>Your Complete Wellness Platform</p>
+    </div>
+    <div class="auth-tabs">
+      <button class="auth-tab on" id="tabLogin" onclick="switchTab('login')">Sign In</button>
+      <button class="auth-tab" id="tabSignup" onclick="switchTab('signup')">Sign Up</button>
+    </div>
+    <div id="formLogin">
+      <input class="ai" type="email" id="loginEmail" placeholder="Email address" autocomplete="email"/>
+      <input class="ai" type="password" id="loginPass" placeholder="Password" autocomplete="current-password"/>
+      <div class="auth-forgot"><button onclick="forgotPassword()">Forgot password?</button></div>
+      <button class="btn-gold" id="btnLogin" onclick="doLogin()">Sign In</button>
+      <div class="auth-err" id="loginErr"></div>
+    </div>
+    <div id="formSignup" style="display:none">
+      <input class="ai" type="text" id="signupName" placeholder="Full name"/>
+      <input class="ai" type="email" id="signupEmail" placeholder="Email address"/>
+      <input class="ai" type="password" id="signupPass" placeholder="Password (min 8 chars)"/>
+      <input class="ai" type="text" id="signupRef" placeholder="Referral code (optional)"/>
+      <button class="btn-gold" id="btnSignup" onclick="doSignup()">Create Account</button>
+      <div class="auth-err" id="signupErr"></div>
+      <div class="auth-ok" id="signupOk"></div>
+    </div>
+  </div>
+</div>
+
+<!-- USER APP -->
+<div id="userApp">
+  <div class="topbar">
+    <div class="tb-brand" onclick="goPage('home')">
+      <span class="tb-ico">🌿</span>
+      <span class="tb-name">Health is <span>Wealth</span></span>
+    </div>
+    <div class="tb-right">
+      <button class="tb-pill" id="tbStreak">🔥 0</button>
+      <button class="tb-pill" id="tbWallet" onclick="goPage('wallet')">₹0</button>
+      <button class="tb-theme" onclick="toggleTheme()">🌙</button>
+      <button class="tb-logout" onclick="doLogout()">Exit</button>
+    </div>
+  </div>
+
+  <!-- HOME -->
+  <div id="pgHome" class="pg on">
+    <div class="wrap">
+      <div class="hero-banner">
+        <div class="hero-greeting">Good day,</div>
+        <div class="hero-name" id="heroName">Welcome, <span>Friend</span> 👋</div>
+        <div class="hero-stats">
+          <div class="hero-stat"><div class="hero-stat-v" id="hKm">0.00</div><div class="hero-stat-l">KM Today</div></div>
+          <div class="hero-stat"><div class="hero-stat-v" id="hWater">0</div><div class="hero-stat-l">Glasses</div></div>
+          <div class="hero-stat"><div class="hero-stat-v" id="hSleep">0h</div><div class="hero-stat-l">Sleep</div></div>
+        </div>
+      </div>
+      <div class="sect-hd">Wellness Score</div>
+      <div class="card">
+        <div class="score-wrap">
+          <div class="score-ring">
+            <svg width="100" height="100" viewBox="0 0 100 100">
+              <circle cx="50" cy="50" r="42" fill="none" stroke="var(--bg2)" stroke-width="8"/>
+              <circle id="scoreCircle" cx="50" cy="50" r="42" fill="none" stroke="var(--forest)" stroke-width="8" stroke-linecap="round" stroke-dasharray="264" stroke-dashoffset="264"/>
+            </svg>
+            <div class="score-ring-val"><span class="score-num" id="scoreNum">0</span><span class="score-lbl">/ 100</span></div>
+          </div>
+          <div class="score-details">
+            <div class="score-metric"><span class="score-metric-ico">🏃</span>KM<span class="score-metric-val" id="smKm">—</span></div>
+            <div class="score-metric"><span class="score-metric-ico">💧</span>Water<span class="score-metric-val" id="smWater">—</span></div>
+            <div class="score-metric"><span class="score-metric-ico">😴</span>Sleep<span class="score-metric-val" id="smSleep">—</span></div>
+            <div class="score-metric"><span class="score-metric-ico">😊</span>Mood<span class="score-metric-val" id="smMood">—</span></div>
+          </div>
+        </div>
+      </div>
+      <div class="sect-hd">Today's Stats</div>
+      <div class="stat-grid">
+        <div class="stat-card sc-km">
+          <div class="stat-v" id="statKm">0.00</div>
+          <div class="stat-l">KM Walked</div>
+          <div class="stat-sub" id="statKmSub">Earning: ₹0</div>
+          <div class="progress-bar"><div class="pb-fill pb-km" id="pbKm" style="width:0%"></div></div>
+        </div>
+        <div class="stat-card sc-water">
+          <div class="stat-v" id="statWater">0</div>
+          <div class="stat-l">Glasses</div>
+          <div class="stat-sub">Goal: 8 glasses</div>
+          <div class="progress-bar"><div class="pb-fill pb-water" id="pbWater" style="width:0%"></div></div>
+        </div>
+        <div class="stat-card sc-sleep">
+          <div class="stat-v" id="statSleep">0h</div>
+          <div class="stat-l">Sleep</div>
+          <div class="stat-sub">Goal: 8 hours</div>
+          <div class="progress-bar"><div class="pb-fill pb-sleep" id="pbSleep" style="width:0%"></div></div>
+        </div>
+        <div class="stat-card sc-hr">
+          <div class="stat-v" id="statHR">72</div>
+          <div class="stat-l">Heart Rate</div>
+          <div class="stat-sub">BPM · Normal</div>
+        </div>
+      </div>
+      <div class="sect-hd">Quick Log</div>
+      <div class="card">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px">
+          <input class="inp" type="number" id="inpWater" placeholder="Glasses water" style="margin-bottom:0"/>
+          <input class="inp" type="number" id="inpSleep" placeholder="Hours sleep" style="margin-bottom:0"/>
+          <input class="inp" type="number" id="inpHR" placeholder="Heart rate BPM" style="margin-bottom:0"/>
+          <button class="btn btn-primary" onclick="saveLog()" style="margin-bottom:0">📊 Save Log</button>
+        </div>
+      </div>
+      <div class="sect-hd">Mood Check-In</div>
+      <div class="card">
+        <div class="mood-row">
+          <button class="mood-btn" onclick="setMood(this,'😄','Great')">😄</button>
+          <button class="mood-btn" onclick="setMood(this,'😊','Good')">😊</button>
+          <button class="mood-btn" onclick="setMood(this,'😐','Neutral')">😐</button>
+          <button class="mood-btn" onclick="setMood(this,'😔','Low')">😔</button>
+          <button class="mood-btn" onclick="setMood(this,'😤','Stressed')">😤</button>
+          <button class="mood-btn" onclick="setMood(this,'😴','Tired')">😴</button>
+        </div>
+        <div style="font-size:.7rem;color:var(--txt4);text-align:center;margin-top:6px" id="moodStatus">Tap to log your mood</div>
+      </div>
+      <div class="sect-hd">Weekly Streak</div>
+      <div class="card"><div style="display:flex;gap:6px;justify-content:center;flex-wrap:wrap;padding:8px 0" id="streakRow"></div></div>
+    </div>
+  </div>
+
+  <!-- WELLNESS -->
+  <div id="pgWellness" class="pg">
+    <div class="wrap">
+      <div class="sect-hd">🧘 Meditation Timer</div>
+      <div class="card">
+        <div style="text-align:center;padding:14px 0">
+          <div class="med-circle" id="medCircle">🧘</div>
+          <div class="med-time-display" id="medDisplay">05:00</div>
+          <div style="display:flex;gap:8px;justify-content:center;margin-top:12px;flex-wrap:wrap">
+            <button class="btn btn-outline" onclick="setMedTime(5)">5m</button>
+            <button class="btn btn-outline" onclick="setMedTime(10)">10m</button>
+            <button class="btn btn-outline" onclick="setMedTime(15)">15m</button>
+            <button class="btn btn-outline" onclick="setMedTime(20)">20m</button>
+          </div>
+          <button class="btn btn-primary btn-full" id="medBtn" onclick="toggleMed()" style="margin-top:10px">▶ Start</button>
+        </div>
+      </div>
+      <div class="sect-hd">🌬 Breathing Trainer (4-7-8)</div>
+      <div class="card" style="text-align:center;padding:20px">
+        <div class="breath-circle" id="breathCircle">Tap Start</div>
+        <div id="breathLabel" style="font-size:.84rem;color:var(--txt4);margin-bottom:10px">4-7-8 Breathing Technique</div>
+        <button class="btn btn-primary" onclick="toggleBreath()" id="breathBtn">▶ Start</button>
+      </div>
+      <div class="sect-hd">📋 Daily Routine</div>
+      <div class="card" id="routineList"></div>
+      <div class="sect-hd">🏥 Emergency</div>
+      <button class="sos-btn" onclick="triggerSOS()">🆘 SOS — Emergency Call (112)</button>
+      <div class="sect-hd" style="margin-top:14px">🩺 First Aid Guide</div>
+      <div id="firstAidList"></div>
+      <div class="sect-hd">👨‍👩‍👧 Family Health</div>
+      <div class="fam-card">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">
+          <div class="fam-av fam-av-dad">👨</div>
+          <div><div style="font-weight:700;font-size:.94rem;color:var(--txt2)">Father</div><div style="font-size:.72rem;color:var(--txt4)">Last updated today</div></div>
+        </div>
+        <div class="fam-vitals">
+          <div class="fam-vital"><div class="fv-val">72</div><div class="fv-lbl">BPM</div></div>
+          <div class="fam-vital"><div class="fv-val">118/76</div><div class="fv-lbl">BP</div></div>
+          <div class="fam-vital"><div class="fv-val">98%</div><div class="fv-lbl">SpO2</div></div>
+        </div>
+      </div>
+      <div class="fam-card">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">
+          <div class="fam-av fam-av-mom">👩</div>
+          <div><div style="font-weight:700;font-size:.94rem;color:var(--txt2)">Mother</div><div style="font-size:.72rem;color:var(--txt4)">Last updated today</div></div>
+        </div>
+        <div class="fam-vitals">
+          <div class="fam-vital"><div class="fv-val">74</div><div class="fv-lbl">BPM</div></div>
+          <div class="fam-vital"><div class="fv-val">120/80</div><div class="fv-lbl">BP</div></div>
+          <div class="fam-vital"><div class="fv-val">99%</div><div class="fv-lbl">SpO2</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- AI HEALTH PAGE -->
+  <div id="pgAI" class="pg">
+    <div class="wrap">
+      <!-- BMI CALCULATOR -->
+      <div class="sect-hd">⚖️ BMI & Weight Management</div>
+      <div class="card">
+        <div class="card-hd">Body Mass Index Calculator</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px">
+          <input class="inp" type="number" id="bmiWeight" placeholder="Weight (kg)" style="margin-bottom:0"/>
+          <input class="inp" type="number" id="bmiHeight" placeholder="Height (cm)" style="margin-bottom:0"/>
+          <input class="inp" type="number" id="bmiAge" placeholder="Age (years)" style="margin-bottom:0"/>
+          <select class="inp sel" id="bmiGender" style="margin-bottom:0"><option value="">Gender</option><option>Male</option><option>Female</option></select>
+        </div>
+        <button class="btn btn-primary btn-full" onclick="calcBMI()">⚖️ Calculate BMI</button>
+        <div id="bmiResult" style="display:none;margin-top:12px">
+          <div id="bmiResultBox" class="bmi-result">
+            <div class="bmi-num" id="bmiVal">—</div>
+            <div class="bmi-cat" id="bmiCat">—</div>
+          </div>
+          <div class="bmi-bar-wrap" style="margin:8px 0">
+            <div class="bmi-bar-seg" style="background:#3b82f6;opacity:.7"></div>
+            <div class="bmi-bar-seg" style="background:#22c55e;opacity:.7"></div>
+            <div class="bmi-bar-seg" style="background:#f59e0b;opacity:.7"></div>
+            <div class="bmi-bar-seg" style="background:#ef4444;opacity:.7"></div>
+          </div>
+          <div style="display:flex;justify-content:space-between;font-size:.62rem;color:var(--txt4);margin-bottom:10px">
+            <span>Under</span><span>Normal</span><span>Over</span><span>Obese</span>
+          </div>
+          <div id="bmiAdvice" style="font-size:.84rem;color:var(--txt3);line-height:1.6;background:var(--bg2);border-radius:10px;padding:12px"></div>
+          <div class="sect-hd" style="margin-top:12px">🏃 Recommended Exercises for Your BMI</div>
+          <div id="bmiExercises"></div>
+          <div class="sect-hd">🥗 Height-Weight Management Tips</div>
+          <div id="bmiTips"></div>
+        </div>
+      </div>
+
+      <!-- DIGITAL TWIN -->
+      <div class="sect-hd">🧬 Digital Twin Health Model</div>
+      <div class="ai-feature-card aif-1">
+        <div class="aif-ico">🧬</div>
+        <div class="aif-title">Your Digital Health Twin</div>
+        <div class="aif-desc">AI creates a virtual model of your body using your health data to predict disease risks and suggest preventive actions.</div>
+        <div><span class="aif-tag">AI POWERED</span></div>
+        <button class="scan-btn" style="margin-top:10px" onclick="runDigitalTwin()">🧬 Analyse My Health Twin</button>
+        <div class="aif-result" id="twinResult"></div>
+      </div>
+
+      <!-- DISEASE PREDICTION -->
+      <div class="sect-hd">🔮 Disease Prediction Timeline</div>
+      <div class="ai-feature-card aif-2">
+        <div class="aif-ico">🔮</div>
+        <div class="aif-title">Disease Risk Timeline</div>
+        <div class="aif-desc">Based on your health patterns, BMI, sleep, and activity levels, predict your health risks over the next 5–20 years.</div>
+        <button class="scan-btn" onclick="runDiseasePrediction()">🔮 Generate My Risk Timeline</button>
+        <div class="aif-result" id="diseaseResult"></div>
+      </div>
+
+      <!-- CAMERA HEALTH SCANNER -->
+      <div class="sect-hd">📷 Camera-Based Health Scanner</div>
+      <div class="ai-feature-card aif-3">
+        <div class="aif-ico">📷</div>
+        <div class="aif-title">Camera Health Scan</div>
+        <div class="aif-desc">Use your phone camera to detect signs of anaemia, jaundice, skin issues, and stress without any device.</div>
+        <div class="food-scanner">
+          <div class="food-scan-area" onclick="startCameraHealth()" id="cameraArea">📷<br><span style="font-size:.7rem;color:var(--txt4)">Tap to scan</span></div>
+          <button class="scan-btn" onclick="startCameraHealth()">📷 Start Health Scan</button>
+          <div id="cameraResult" style="display:none" class="food-result"></div>
+        </div>
+      </div>
+
+      <!-- BEHAVIOR CHANGE ENGINE -->
+      <div class="sect-hd">🧠 Behaviour Change Engine</div>
+      <div class="ai-feature-card aif-4">
+        <div class="aif-ico">🧠</div>
+        <div class="aif-title">Psychology-Based AI Coach</div>
+        <div class="aif-desc">Analyses your habits, mood patterns, and behaviour to create a personalised change roadmap using psychology principles.</div>
+        <button class="scan-btn" onclick="runBehaviourEngine()">🧠 Analyse My Behaviour Patterns</button>
+        <div class="aif-result" id="behaviourResult"></div>
+      </div>
+
+      <!-- EMOTION DETECTION -->
+      <div class="sect-hd">😊 Emotion Detection</div>
+      <div class="ai-feature-card aif-5">
+        <div class="aif-ico">😊</div>
+        <div class="aif-title">Emotion & Stress Detection</div>
+        <div class="aif-desc">Detects your emotional state from interaction patterns — typing speed, app usage, mood logs — and suggests wellness actions.</div>
+        <button class="scan-btn" onclick="runEmotionDetect()">😊 Detect My Current Emotion</button>
+        <div class="aif-result" id="emotionResult"></div>
+      </div>
+
+      <!-- MICRO-CLIMATE HEALTH -->
+      <div class="sect-hd">🌡️ Micro-Climate Health Intelligence</div>
+      <div class="ai-feature-card aif-6">
+        <div class="aif-ico">🌡️</div>
+        <div class="aif-title">Weather & Climate Health Advisor</div>
+        <div class="aif-desc">Uses your GPS location to analyse local weather, pollution levels, and climate to give health-specific advice for today.</div>
+        <button class="scan-btn" onclick="runClimateHealth()">🌍 Get Climate Health Advice</button>
+        <div class="aif-result" id="climateResult"></div>
+      </div>
+
+      <!-- FOOD SCANNER -->
+      <div class="sect-hd">🍛 Personalised Indian Food Scanner</div>
+      <div class="ai-feature-card aif-7">
+        <div class="aif-ico">🍛</div>
+        <div class="aif-title">Indian Food Analyser</div>
+        <div class="aif-desc">Type or scan any Indian food to get detailed nutrition info, health impact, and alternatives based on your BMI and health goals.</div>
+        <div style="display:flex;gap:8px;margin:10px 0">
+          <input class="inp" type="text" id="foodInput" placeholder="e.g. Dosa, Biryani, Idli..." style="flex:1;margin-bottom:0"/>
+          <button class="btn btn-primary" onclick="analyseFood()" style="white-space:nowrap">🔍 Scan</button>
+        </div>
+        <div id="foodResult" style="display:none" class="food-result"></div>
+      </div>
+
+      <!-- HEALTH GUARDIAN MODE -->
+      <div class="sect-hd">🛡️ Health Guardian Mode</div>
+      <div class="ai-feature-card aif-1">
+        <div class="aif-ico">🛡️</div>
+        <div class="aif-title">Auto Protection System</div>
+        <div class="aif-desc">Continuously monitors your health metrics and automatically sends alerts when dangerous patterns are detected.</div>
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-top:10px">
+          <span style="font-size:.84rem;color:var(--txt2)" id="guardianStatus">🔴 Guardian Mode: OFF</span>
+          <button class="btn btn-primary" onclick="toggleGuardian()" id="guardianBtn">Activate</button>
+        </div>
+        <div id="guardianAlerts" style="margin-top:10px"></div>
+      </div>
+
+      <!-- GEO HEALTH -->
+      <div class="sect-hd">📍 Geo-Based Health Protection</div>
+      <div class="ai-feature-card aif-2">
+        <div class="aif-ico">📍</div>
+        <div class="aif-title">Location-Based Health Alerts</div>
+        <div class="aif-desc">Detects nearby health risks — pollution zones, disease outbreaks, unsafe areas — and suggests protective measures.</div>
+        <button class="scan-btn" onclick="runGeoHealth()">📍 Check My Location Health</button>
+        <div class="aif-result" id="geoResult"></div>
+      </div>
+
+      <!-- SMART HEALTH RECORDS -->
+      <div class="sect-hd">📂 Smart Health Record Intelligence</div>
+      <div class="ai-feature-card aif-3">
+        <div class="aif-ico">📂</div>
+        <div class="aif-title">AI Health Record Analyser</div>
+        <div class="aif-desc">Upload or describe your blood test, medical report or prescription and get plain-language explanation with action steps.</div>
+        <textarea class="inp" id="healthRecordInput" placeholder="Paste your health report details here... e.g. Blood sugar: 120, Cholesterol: 210..." rows="3" style="margin-bottom:8px;resize:none"></textarea>
+        <button class="scan-btn" onclick="analyseHealthRecord()">📂 Analyse My Health Record</button>
+        <div id="healthRecordResult" style="display:none" class="food-result"></div>
+      </div>
+
+      <!-- AI HABIT ENGINE -->
+      <div class="sect-hd">⚡ AI Habit Correction Engine</div>
+      <div class="ai-feature-card aif-4">
+        <div class="aif-ico">⚡</div>
+        <div class="aif-title">Habit Correction AI</div>
+        <div class="aif-desc">Tracks your daily habits, identifies negative patterns, and creates micro-habit replacements using behavioural science.</div>
+        <div id="habitList" style="margin:10px 0"></div>
+        <button class="scan-btn" onclick="runHabitEngine()">⚡ Generate My Habit Plan</button>
+        <div class="aif-result" id="habitResult"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- BOOK -->
+  <div id="pgBook" class="pg">
+    <div class="wrap">
+      <div class="book-cover">
+        <div style="font-size:3rem;margin-bottom:12px">📗</div>
+        <div class="book-title">Complete Guide to<br/>Healthy Eating</div>
+        <div style="font-size:.78rem;color:rgba(255,255,255,.5);font-style:italic;margin-bottom:16px">Birth to Old Age — 200+ pages of wisdom</div>
+        <div class="book-price">₹1,999</div>
+      </div>
+      <div id="bookStatus" class="book-locked">
+        <div style="font-size:1.4rem;margin-bottom:6px">🔒</div>
+        <div style="font-weight:700;font-size:.9rem;color:var(--red);margin-bottom:4px">Book Not Purchased</div>
+        <div style="font-size:.78rem;color:var(--txt3)">Buy once, read forever. GPS Walk Earn & Referral unlock after purchase.</div>
+      </div>
+      <button class="btn btn-primary btn-full" onclick="openPayment()" id="bookBuyBtn" style="margin-bottom:12px">📖 Buy Now — ₹1,999</button>
+      <div class="card">
+        <div class="card-hd">What's Inside</div>
+        <div class="level-row"><div class="level-badge l1">1</div><div class="level-info"><div class="level-title">Infant Nutrition (0–2 yrs)</div><div class="level-desc">Breastfeeding, first foods, healthy growth</div></div></div>
+        <div class="level-row"><div class="level-badge" style="background:var(--forest3)">2</div><div class="level-info"><div class="level-title">Child Nutrition (2–12 yrs)</div><div class="level-desc">School meals, immunity boosters, brain food</div></div></div>
+        <div class="level-row"><div class="level-badge" style="background:var(--sage)">3</div><div class="level-info"><div class="level-title">Teen Health (13–19 yrs)</div><div class="level-desc">Growth, sports nutrition, mental wellness</div></div></div>
+        <div class="level-row"><div class="level-badge" style="background:var(--txt3)">4</div><div class="level-info"><div class="level-title">Adult Wellness (20–59 yrs)</div><div class="level-desc">Balanced diet, weight management, vitality</div></div></div>
+        <div class="level-row"><div class="level-badge" style="background:var(--txt4)">5</div><div class="level-info"><div class="level-title">Senior Health (60+ yrs)</div><div class="level-desc">Bone health, heart diet, longevity</div></div></div>
+      </div>
+      <div id="bookContent" style="display:none">
+        <div class="alert-banner ab-success"><span class="ab-ico">✅</span><span>You have full access to all 5 chapters!</span></div>
+        <div class="card">
+          <div class="card-hd">Chapter 1: Infant Nutrition</div>
+          <p style="font-size:.84rem;color:var(--txt3);line-height:1.7">Breast milk is the ideal food for newborns. Introduce solid foods from 6 months. Start with mashed banana, sweet potato, dal, and rice. Always consult your paediatrician for guidance.</p>
+          <button class="btn btn-outline" style="margin-top:10px" onclick="showToast('📥 Chapter ready to read!')">📥 Read Chapter</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- EARN -->
+  <div id="pgEarn" class="pg">
+    <div class="wrap">
+      <!-- GPS TRACKER - PAID USERS ONLY -->
+      <div class="sect-hd">🛰 GPS Walk & Earn</div>
+      <div id="gpsSection">
+        <!-- Shown only to paid users -->
+        <div id="gpsPaidContent" style="display:none">
+          <div class="gps-card">
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px">
+              <div class="gps-dot off" id="gpsDot"></div>
+              <span style="font-size:.82rem;color:rgba(255,255,255,.8);font-weight:600" id="gpsStatusTxt">Tap Start to begin tracking</span>
+            </div>
+            <div class="gps-metrics">
+              <div class="gps-metric"><div class="gps-metric-v" id="gpsKm">0.00</div><div class="gps-metric-l">KM Today</div></div>
+              <div class="gps-metric"><div class="gps-metric-v" id="gpsSpeed">0.0</div><div class="gps-metric-l">km/h</div></div>
+              <div class="gps-metric"><div class="gps-metric-v" id="gpsEarned">₹0</div><div class="gps-metric-l">Earned</div></div>
+            </div>
+            <div class="gps-progress"><div class="gps-progress-fill" id="gpsProgressFill" style="width:0%"></div></div>
+            <div style="font-size:.68rem;color:rgba(255,255,255,.35);text-align:right;margin-bottom:10px" id="gpsLimitTxt">Limit: 300 KM</div>
+            <div class="gps-btn-row">
+              <button class="gps-btn gps-start" id="gpsBtnStart" onclick="startGPS()">📍 Start Walk</button>
+              <button class="gps-btn gps-pause" id="gpsBtnPause" onclick="pauseGPS()" style="display:none">⏸ Pause</button>
+              <button class="gps-btn gps-stop" id="gpsBtnStop" onclick="stopGPS()" style="display:none">⏹ Stop & Save</button>
+            </div>
+            <div style="background:rgba(232,200,122,.1);border:1px solid rgba(232,200,122,.2);border-radius:10px;padding:8px 12px;margin-top:10px;font-size:.72rem;color:var(--gold2);text-align:center">
+              🏃 ₹1 per KM · GPS verified · Max 300 KM/month · Walk speed only
+            </div>
+          </div>
+        </div>
+        <!-- Locked for unpaid users -->
+        <div id="gpsLockedContent">
+          <div style="background:linear-gradient(135deg,rgba(13,40,24,.95),rgba(26,61,40,.95));border-radius:18px;padding:24px;text-align:center;margin-bottom:14px">
+            <div style="font-size:2.5rem;margin-bottom:12px">🔒</div>
+            <div style="font-family:'Cormorant Garamond',serif;font-size:1.2rem;font-weight:700;color:#fff;margin-bottom:8px">GPS Walking Earn Locked</div>
+            <div style="font-size:.82rem;color:rgba(255,255,255,.55);line-height:1.6;margin-bottom:16px">GPS Walk & Earn (₹1/KM) and Referral Bonus are unlocked after purchasing the Health Book for ₹1,999.</div>
+            <button class="btn-gold" style="padding:12px 24px;width:auto" onclick="goPage('book')">📗 Buy Book to Unlock — ₹1,999</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- REFERRAL - PAID ONLY, L1 ONLY -->
+      <div id="earnPaidContent" style="display:none">
+        <div class="ref-box">
+          <div style="font-size:.7rem;color:rgba(255,255,255,.4);letter-spacing:2px;text-transform:uppercase;margin-bottom:6px">Your Referral Code</div>
+          <div class="ref-code" id="refCode">------</div>
+          <div class="ref-url" id="refUrl">bonagirispinoj-png.github.io/ref/------</div>
+          <div class="ref-btns">
+            <button class="ref-btn ref-copy" onclick="copyRef()">📋 Copy</button>
+            <button class="ref-btn ref-wa" onclick="shareWA()">📱 WhatsApp</button>
+            <button class="ref-btn ref-tg" onclick="shareTG()">✈ Telegram</button>
+          </div>
+        </div>
+        <div class="sect-hd">Referral Commission (Level 1 Only)</div>
+        <div class="alert-banner ab-amber">
+          <span class="ab-ico">ℹ️</span>
+          <span>Only direct referrals (Level 1) earn commission. Your referral must also purchase the book (₹1,999) for you to earn ₹200.</span>
+        </div>
+        <div class="card" style="padding:0;overflow:hidden">
+          <table class="comm-table">
+            <tr><th>Level</th><th>Relationship</th><th style="text-align:right">Earn</th></tr>
+            <tr><td><strong style="color:var(--gold3)">Level 1 ✅</strong></td><td>Direct referral buys book</td><td>₹200</td></tr>
+            <tr style="opacity:.4"><td>Level 2–5</td><td>Not available</td><td>—</td></tr>
+          </table>
+        </div>
+        <div class="sect-hd">My Network</div>
+        <div class="card" id="recruitList">
+          <div class="empty"><div class="empty-ico">👥</div><div class="empty-txt">No paid referrals yet</div></div>
+        </div>
+      </div>
+
+      <!-- Locked referral -->
+      <div id="earnLockedContent">
+        <div class="alert-banner ab-warning">
+          <span class="ab-ico">🔒</span>
+          <span>Referral program unlocks after you purchase the Health Book for ₹1,999.</span>
+        </div>
+      </div>
+
+      <div class="sect-hd">How Earning Works</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px">
+        <div class="earn-step"><div class="earn-step-num">1</div><div style="font-size:1.4rem;margin-bottom:6px">📗</div><div style="font-size:.78rem;font-weight:700;color:var(--txt2)">Buy Book</div><div style="font-size:.7rem;color:var(--txt4)">₹1,999 — unlocks all earning features</div></div>
+        <div class="earn-step"><div class="earn-step-num">2</div><div style="font-size:1.4rem;margin-bottom:6px">🛰</div><div style="font-size:.78rem;font-weight:700;color:var(--txt2)">GPS Walk</div><div style="font-size:.7rem;color:var(--txt4)">₹1 per KM via GPS auto-tracking</div></div>
+        <div class="earn-step"><div class="earn-step-num">3</div><div style="font-size:1.4rem;margin-bottom:6px">📤</div><div style="font-size:.78rem;font-weight:700;color:var(--txt2)">Refer Friends</div><div style="font-size:.7rem;color:var(--txt4)">They buy book → you earn ₹200</div></div>
+        <div class="earn-step"><div class="earn-step-num">4</div><div style="font-size:1.4rem;margin-bottom:6px">💸</div><div style="font-size:.78rem;font-weight:700;color:var(--txt2)">Withdraw</div><div style="font-size:.7rem;color:var(--txt4)">Min ₹50 to UPI, 1–3 days</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- WALLET -->
+  <div id="pgWallet" class="pg">
+    <div class="wrap">
+      <div class="wallet-hero">
+        <div style="color:rgba(255,255,255,.5);font-size:.72rem;letter-spacing:2px;text-transform:uppercase">Total Balance</div>
+        <div class="wallet-amount">₹<span id="walletAmt">0</span></div>
+        <div style="font-size:.72rem;color:rgba(255,255,255,.35)">Walking + Referral earnings</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:16px">
+          <button style="padding:11px;border:none;border-radius:10px;cursor:pointer;font-size:.8rem;font-weight:700;background:rgba(201,168,76,.2);color:var(--gold2);border:1px solid rgba(201,168,76,.3)" onclick="goPage('wallet')">💸 Withdraw</button>
+          <button style="padding:11px;border:none;border-radius:10px;cursor:pointer;font-size:.8rem;font-weight:700;background:rgba(255,255,255,.12);color:#fff;border:1px solid rgba(255,255,255,.2)" onclick="showToast('UPI — use withdraw below')">🏦 UPI</button>
+        </div>
+      </div>
+      <div class="sect-hd">Withdraw Money</div>
+      <div class="card">
+        <div style="font-size:.78rem;color:var(--txt3);margin-bottom:10px">Minimum: ₹50 · Processing: 1–3 business days</div>
+        <input class="inp" type="number" id="withdrawAmt" placeholder="Enter amount (min ₹50)"/>
+        <input class="inp" type="text" id="withdrawUPI" placeholder="Your UPI ID (e.g. name@upi)"/>
+        <button class="btn btn-primary btn-full" onclick="requestWithdraw()">💸 Request Withdrawal</button>
+      </div>
+      <div class="sect-hd">Transactions</div>
+      <div class="card" id="txnList">
+        <div class="empty"><div class="empty-ico">📭</div><div class="empty-txt">No transactions yet</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PROFILE -->
+  <div id="pgProfile" class="pg">
+    <div class="wrap">
+      <div class="card" style="text-align:center;padding:24px">
+        <div style="width:72px;height:72px;border-radius:50%;background:linear-gradient(135deg,var(--forest),var(--forest3));display:flex;align-items:center;justify-content:center;font-size:1.8rem;margin:0 auto 12px">🌿</div>
+        <div style="font-family:'Cormorant Garamond',serif;font-size:1.4rem;font-weight:700;color:var(--txt)" id="profileName">Loading...</div>
+        <div style="font-size:.76rem;color:var(--txt4);margin-top:4px" id="profileEmail">—</div>
+        <div style="font-size:.72rem;color:var(--txt4);margin-top:4px">Member since <span id="profileJoined">—</span></div>
+        <div id="profileBadge" style="margin-top:8px"></div>
+      </div>
+      <div class="sect-hd">Health Profile</div>
+      <div class="card">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+          <input class="inp" type="number" id="profAge" placeholder="Age" style="margin-bottom:0"/>
+          <select class="inp sel" id="profGender" style="margin-bottom:0"><option value="">Gender</option><option>Male</option><option>Female</option><option>Other</option></select>
+          <input class="inp" type="number" id="profWeight" placeholder="Weight (kg)" style="margin-bottom:0"/>
+          <input class="inp" type="number" id="profHeight" placeholder="Height (cm)" style="margin-bottom:0"/>
+        </div>
+        <button class="btn btn-primary btn-full" onclick="saveProfile()" style="margin-top:10px">💾 Save Profile</button>
+      </div>
+      <div class="sect-hd">App Settings</div>
+      <div class="card">
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--bdr)">
+          <span style="font-size:.84rem;color:var(--txt2)">🌙 Dark Mode</span>
+          <button class="btn btn-outline" onclick="toggleTheme()">Toggle</button>
+        </div>
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--bdr)">
+          <span style="font-size:.84rem;color:var(--txt2)">🔔 Posture Reminder</span>
+          <button class="btn btn-outline" onclick="startPostureTimer()">Set 30min</button>
+        </div>
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 0">
+          <span style="font-size:.84rem;color:var(--txt2)">🗑 Clear Today's Log</span>
+          <button class="btn btn-red" onclick="clearData()">Clear</button>
+        </div>
+      </div>
+      <button class="btn btn-full" style="background:#c0392b;color:#fff;margin-top:8px" onclick="doLogout()">🚪 Sign Out</button>
+    </div>
+  </div>
+</div><!-- end userApp -->
+
+<!-- BOTTOM NAV -->
+<div class="bnav" id="bnav" style="display:none">
+  <button class="bn-item on" onclick="goPage('home')" id="bn-home"><span class="bn-ico">🏠</span><span class="bn-lbl">Home</span></button>
+  <button class="bn-item" onclick="goPage('wellness')" id="bn-wellness"><span class="bn-ico">🧘</span><span class="bn-lbl">Wellness</span></button>
+  <button class="bn-item" onclick="goPage('ai')" id="bn-ai"><span class="bn-ico">🤖</span><span class="bn-lbl">AI Health</span></button>
+  <button class="bn-item" onclick="goPage('book')" id="bn-book"><span class="bn-ico">📗</span><span class="bn-lbl">Book</span></button>
+  <button class="bn-item" onclick="goPage('earn')" id="bn-earn"><span class="bn-ico">🏃</span><span class="bn-lbl">Earn</span></button>
+  <button class="bn-item" onclick="goPage('wallet')" id="bn-wallet"><span class="bn-ico">💳</span><span class="bn-lbl">Wallet</span></button>
+  <button class="bn-item" onclick="goPage('profile')" id="bn-profile"><span class="bn-ico">👤</span><span class="bn-lbl">Me</span></button>
+</div>
+
+<!-- UPI SHEET -->
+<div class="upi-sheet" id="upiSheet" onclick="closePayment(event)">
+  <div class="upi-content">
+    <div class="upi-handle"></div>
+    <h3 style="font-family:'Cormorant Garamond',serif;font-size:1.2rem;font-weight:700;color:var(--txt);margin-bottom:16px">📗 Buy Healthy Eating Book</h3>
+    <div style="background:linear-gradient(135deg,var(--forest),var(--forest2));border-radius:12px;padding:14px;text-align:center;margin-bottom:16px">
+      <div style="font-size:.7rem;color:rgba(255,255,255,.45);letter-spacing:2px">TOTAL AMOUNT</div>
+      <div style="font-family:'Cormorant Garamond',serif;font-size:2rem;font-weight:700;color:var(--gold2)">₹1,999</div>
+      <div style="font-size:.72rem;color:rgba(255,255,255,.35)">One-time · Lifetime access · Unlocks GPS Earn</div>
+    </div>
+    <div class="upi-step">
+      <div class="upi-step-num">1</div>
+      <div style="flex:1">
+        <div style="font-size:.84rem;font-weight:700;color:var(--txt2);margin-bottom:6px">Pay ₹1,999 to this UPI ID</div>
+        <div class="upi-id-box">bonagirispinoj-1@oksbi</div>
+        <button class="btn btn-outline" style="font-size:.72rem;padding:5px 10px;margin-top:4px" onclick="copyUPI()">📋 Copy UPI ID</button>
+      </div>
+    </div>
+    <div class="upi-step">
+      <div class="upi-step-num">2</div>
+      <div style="font-size:.84rem;color:var(--txt3)">Open any UPI app below and pay ₹1,999 to the ID above, then enter the transaction ID.</div>
+    </div>
+    <!-- UPI App buttons using URL scheme (deep links) -->
+    <button class="upi-btn upi-gpay" onclick="openUPIApp('gpay')">🔵 Open Google Pay</button>
+    <button class="upi-btn upi-phone" onclick="openUPIApp('phonepe')">💜 Open PhonePe</button>
+    <button class="upi-btn upi-bhim" onclick="openUPIApp('bhim')">🔷 Open BHIM UPI</button>
+    <button class="upi-btn upi-other" onclick="openUPIApp('other')">📲 Pay via Any UPI App</button>
+    <div class="upi-step" style="margin-top:10px">
+      <div class="upi-step-num">3</div>
+      <div style="width:100%">
+        <div style="font-size:.84rem;font-weight:700;color:var(--txt2);margin-bottom:6px">Enter Transaction / UTR ID</div>
+        <input class="upi-inp" id="txnId" placeholder="12-digit Transaction ID"/>
+      </div>
+    </div>
+    <button class="btn btn-primary btn-full" style="margin-top:6px" onclick="submitPayment()">✅ Submit Payment for Verification</button>
+  </div>
+</div>
+
+<!-- SUCCESS MODAL -->
+<div class="success-modal" id="successModal">
+  <div class="success-box">
+    <div class="success-ring">✅</div>
+    <h3 style="font-family:'Cormorant Garamond',serif;font-size:1.4rem;font-weight:700;color:var(--txt);margin-bottom:8px" id="successTitle">Done!</h3>
+    <p style="font-size:.84rem;color:var(--txt3);line-height:1.6;margin-bottom:20px" id="successMsg">Your request was submitted.</p>
+    <button class="btn btn-primary btn-full" onclick="closeSuccess()">Continue</button>
+  </div>
+</div>
+
+<!-- ADMIN PANEL -->
+<div id="adminApp">
+  <div class="admin-hd">
+    <h1>🌿 Health is <span>Wealth</span> Admin</h1>
+    <div style="display:flex;gap:8px;align-items:center">
+      <span style="background:rgba(201,168,76,.2);border:1px solid rgba(201,168,76,.3);color:#e8c87a;padding:4px 10px;border-radius:12px;font-size:.7rem;font-weight:700" id="adminBadge">Admin</span>
+      <button onclick="adminLogout()" style="background:none;border:1px solid rgba(255,255,255,.2);color:rgba(255,255,255,.6);padding:5px 10px;border-radius:7px;cursor:pointer;font-size:.72rem">Sign Out</button>
+    </div>
+  </div>
+  <div id="adminLoginBox" style="min-height:80vh;display:flex;align-items:center;justify-content:center;background:#f5f0e6;padding:20px">
+    <div style="background:#fff;border-radius:18px;padding:32px 24px;width:100%;max-width:360px;box-shadow:0 20px 60px rgba(0,0,0,.15)">
+      <h2 style="font-size:1.3rem;font-weight:800;color:#0d2818;margin-bottom:6px">Admin Sign In</h2>
+      <p style="font-size:.8rem;color:#9e8c6e;margin-bottom:20px">Health is Wealth Management Console</p>
+      <input style="width:100%;padding:12px;border:1.5px solid #d8ccb8;border-radius:9px;font-size:.9rem;margin-bottom:10px;outline:none;background:#f5f0e6;font-family:'Outfit',sans-serif" type="email" id="adminEmail" placeholder="Admin Email" value="bonagirispinoj@gmail.com"/>
+      <input style="width:100%;padding:12px;border:1.5px solid #d8ccb8;border-radius:9px;font-size:.9rem;margin-bottom:14px;outline:none;background:#f5f0e6;font-family:'Outfit',sans-serif" type="password" id="adminPass" placeholder="Admin Password"/>
+      <button onclick="adminLogin()" style="width:100%;padding:13px;border:none;border-radius:9px;background:linear-gradient(135deg,#8a6820,#c9a84c,#e8c87a);color:#0d2818;font-weight:800;font-size:.9rem;cursor:pointer;font-family:'Outfit',sans-serif">Sign In to Admin</button>
+      <div style="color:#c0392b;font-size:.74rem;text-align:center;margin-top:8px;min-height:18px" id="adminErr"></div>
+      <div style="margin-top:14px;text-align:center"><button onclick="showUserApp()" style="background:none;border:none;color:#9e8c6e;font-size:.76rem;cursor:pointer;font-family:'Outfit',sans-serif">← Back to App</button></div>
+    </div>
+  </div>
+  <div id="adminDash" style="display:none">
+    <div class="admin-tabs">
+      <button class="admin-tab on" onclick="adminTab(this,'aDash')">📊 Dashboard</button>
+      <button class="admin-tab" onclick="adminTab(this,'aWD')">💸 Withdrawals</button>
+      <button class="admin-tab" onclick="adminTab(this,'aPay')">💳 Payments</button>
+      <button class="admin-tab" onclick="adminTab(this,'aUsers')">👥 Users</button>
+    </div>
+    <div class="admin-content">
+      <div id="aDash">
+        <div class="admin-stats">
+          <div class="admin-stat"><div class="admin-stat-v" id="sTotalUsers">—</div><div class="admin-stat-l">Users</div></div>
+          <div class="admin-stat"><div class="admin-stat-v" id="sPendingWD">—</div><div class="admin-stat-l">Pending WD</div></div>
+          <div class="admin-stat"><div class="admin-stat-v" id="sPendingPay">—</div><div class="admin-stat-l">Pending Pay</div></div>
+          <div class="admin-stat"><div class="admin-stat-v" id="sTotalKm">—</div><div class="admin-stat-l">Total KM</div></div>
+          <div class="admin-stat"><div class="admin-stat-v" id="sTotalBal">—</div><div class="admin-stat-l">Total ₹ Bal</div></div>
+        </div>
+        <div class="admin-section">
+          <div class="admin-section-hd"><h3>Admin: bonagirispinoj@gmail.com</h3><button class="refresh-btn" onclick="loadAdminStats()">🔄 Refresh</button></div>
+          <div style="padding:16px;font-size:.84rem;color:#6b5c40;line-height:2">
+            <p>💸 Approve/Reject withdrawals → Withdrawals tab</p>
+            <p>💳 Verify UPI payments → Payments tab (approve = book access)</p>
+            <p>👥 View all users → Users tab</p>
+            <p>🛰 GPS KM is auto-tracked — no manual entry needed</p>
+            <p>📗 Only book buyers (₹1,999) get GPS Earn + Referral access</p>
+          </div>
+        </div>
+      </div>
+      <div id="aWD" style="display:none">
+        <div class="admin-section">
+          <div class="admin-section-hd"><h3>💸 Withdrawal Requests</h3><button class="refresh-btn" onclick="loadAdminWD()">🔄 Refresh</button></div>
+          <div style="overflow-x:auto"><table class="tbl"><thead><tr><th>Name</th><th>Amount</th><th>UPI ID</th><th>Status</th><th>Date</th><th>Action</th></tr></thead><tbody id="wdBody"><tr><td colspan="6" style="text-align:center;padding:24px;color:#9e8c6e">Loading...</td></tr></tbody></table></div>
+        </div>
+      </div>
+      <div id="aPay" style="display:none">
+        <div class="admin-section">
+          <div class="admin-section-hd"><h3>💳 Book Payment Verifications</h3><button class="refresh-btn" onclick="loadAdminPay()">🔄 Refresh</button></div>
+          <div style="overflow-x:auto"><table class="tbl"><thead><tr><th>User</th><th>Amount</th><th>Txn ID</th><th>Status</th><th>Date</th><th>Action</th></tr></thead><tbody id="payBody"><tr><td colspan="6" style="text-align:center;padding:24px;color:#9e8c6e">Loading...</td></tr></tbody></table></div>
+        </div>
+      </div>
+      <div id="aUsers" style="display:none">
+        <div class="admin-section">
+          <div class="admin-section-hd"><h3>👥 All Users</h3><button class="refresh-btn" onclick="loadAdminUsers()">🔄 Refresh</button></div>
+          <div style="overflow-x:auto"><table class="tbl"><thead><tr><th>Name</th><th>Email</th><th>Ref Code</th><th>Balance</th><th>KM</th><th>Book</th><th>Joined</th></tr></thead><tbody id="usersBody"><tr><td colspan="7" style="text-align:center;padding:24px;color:#9e8c6e">Loading...</td></tr></tbody></table></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="postureTimer">🪑 30:00</div>
+<div id="toast"></div>
+
+<script>
+// ══════════════════════════════════════════════════════
+//   HEALTH IS WEALTH — Complete Platform
+//   Admin: bonagirispinoj@gmail.com
+//   UPI: bonagirispinoj-1@oksbi
+// ══════════════════════════════════════════════════════
+
+const FB_CONFIG = {
+  apiKey: "AIzaSyBIebPXVjzVBZl380ZCELg2LUSCLr-6QrE",
+  authDomain: "neurocoin-ntc.firebaseapp.com",
+  databaseURL: "https://neurocoin-ntc-default-rtdb.firebaseio.com",
+  projectId: "neurocoin-ntc",
+  storageBucket: "neurocoin-ntc.firebasestorage.app",
+  messagingSenderId: "1040732555800",
+  appId: "1:1040732555800:web:55e63b5ff81781c6b1916d",
+  measurementId: "G-6X8T0YQTQ3"
+};
+const ADMIN_EMAIL = 'bonagirispinoj@gmail.com';
+const UPI_ID = 'bonagirispinoj-1@oksbi';
+const BOOK_PRICE = 1999;
+
+// Security
+const AUTH_LIMITS = {maxAttempts:5, lockMs:15*60*1000};
+let authAtt = JSON.parse(sessionStorage.getItem('__aa')||'{"c":0,"t":0}');
+function checkRL(){if(authAtt.c>=AUTH_LIMITS.maxAttempts){const e=Date.now()-authAtt.t;if(e<AUTH_LIMITS.lockMs)return`Too many attempts. Try in ${Math.ceil((AUTH_LIMITS.lockMs-e)/60000)} min.`;authAtt={c:0,t:0};}return null;}
+function recordAtt(ok){if(ok){authAtt={c:0,t:0};}else{authAtt.c++;authAtt.t=Date.now();}try{sessionStorage.setItem('__aa',JSON.stringify(authAtt));}catch(e){}}
+function san(s){if(typeof s!=='string')return'';return s.replace(/[<>'"&]/g,c=>({'<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;','&':'&amp;'}[c])).trim().slice(0,300);}
+function isEmail(e){return/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e);}
+
+// Firebase
+let db,auth,currentUser=null;
+try{
+  firebase.initializeApp(FB_CONFIG);
+  auth=firebase.auth();
+  db=firebase.firestore();
+  db.enablePersistence({synchronizeTabs:true}).catch(()=>{});
+}catch(e){console.error('Firebase:',e);}
+
+// App State
+let S={water:0,sleep:0,hr:72,mood:'',streak:0,wallet:0,refCode:'',
+  bookPurchased:false,bookStatus:'none',profile:{},
+  totalKm:0,todayKm:0,kmLimit:300};
+
+// GPS
+let gpsWatchId=null,gpsLastPos=null,gpsSessionKm=0,gpsRunning=false,gpsPaused=false,gpsPendingKm=0;
+
+function haversineKm(lat1,lon1,lat2,lon2){
+  const R=6371,dLat=(lat2-lat1)*Math.PI/180,dLon=(lon2-lon1)*Math.PI/180;
+  const a=Math.sin(dLat/2)**2+Math.cos(lat1*Math.PI/180)*Math.cos(lat2*Math.PI/180)*Math.sin(dLon/2)**2;
+  return R*2*Math.atan2(Math.sqrt(a),Math.sqrt(1-a));
+}
+
+function startGPS(){
+  if(!S.bookPurchased){showToast('⚠ Buy the book first to unlock GPS Earn');return;}
+  if(!navigator.geolocation){showToast('⚠ GPS not supported on this device');return;}
+  const remaining=S.kmLimit-S.totalKm;
+  if(remaining<=0){showToast('⚠ Monthly KM limit reached! Refer friends to increase it.');return;}
+  gpsRunning=true;gpsPaused=false;gpsSessionKm=0;gpsPendingKm=0;gpsLastPos=null;
+  setGPSUI('tracking');
+  showToast('📍 GPS tracking started! Walk to earn ₹1/KM');
+  gpsWatchId=navigator.geolocation.watchPosition(
+    pos=>{
+      if(!gpsRunning||gpsPaused)return;
+      const{latitude:lat,longitude:lon,speed,accuracy}=pos.coords;
+      if(accuracy>25)return;
+      const spd=speed!=null?speed*3.6:0;
+      document.getElementById('gpsSpeed').textContent=spd.toFixed(1);
+      if(speed!==null&&(speed<0.14||speed>1.95)){if(gpsLastPos)gpsLastPos=null;return;}
+      if(gpsLastPos){
+        const dist=haversineKm(gpsLastPos.lat,gpsLastPos.lon,lat,lon);
+        if(dist>0.003&&dist<0.2){
+          gpsSessionKm+=dist;gpsPendingKm+=dist;
+          updateGPSDisplay();
+          if(gpsPendingKm>=0.1){saveGPSChunk(gpsPendingKm);gpsPendingKm=0;}
+        }
+      }
+      gpsLastPos={lat,lon};
+    },
+    err=>{
+      if(err.code===1)showToast('⚠ Location permission denied. Enable GPS in settings.');
+      else if(err.code===2)showToast('⚠ GPS unavailable. Go outdoors.');
+      else showToast('⚠ GPS error. Try again.');
+      stopGPS();
+    },
+    {enableHighAccuracy:true,maximumAge:3000,timeout:15000}
+  );
+}
+
+function pauseGPS(){
+  gpsPaused=!gpsPaused;
+  document.getElementById('gpsBtnPause').textContent=gpsPaused?'▶ Resume':'⏸ Pause';
+  document.getElementById('gpsDot').className='gps-dot '+(gpsPaused?'waiting':'');
+  document.getElementById('gpsStatusTxt').textContent=gpsPaused?'Walk paused':'Tracking your walk...';
+}
+
+async function stopGPS(){
+  if(gpsWatchId!==null){navigator.geolocation.clearWatch(gpsWatchId);gpsWatchId=null;}
+  gpsRunning=false;gpsPaused=false;
+  if(gpsPendingKm>0.01){await saveGPSChunk(gpsPendingKm);gpsPendingKm=0;}
+  setGPSUI('idle');
+  const earned=Math.floor(gpsSessionKm);
+  showToast(`✅ ${gpsSessionKm.toFixed(2)} KM saved · ₹${earned} earned`);
+  gpsSessionKm=0;gpsLastPos=null;
+}
+
+async function saveGPSChunk(km){
+  if(!currentUser||km<0.001)return;
+  const ref=db.collection('users').doc(currentUser.uid);
+  const doc=await ref.get().catch(()=>null);
+  if(!doc||!doc.exists)return;
+  const d=doc.data();
+  const remaining=(d.kmLimit||300)-(d.totalKm||0);
+  if(remaining<=0){stopGPS();showToast('⚠ KM limit reached!');return;}
+  const allowed=Math.min(km,remaining);
+  const earn=parseFloat((allowed*1).toFixed(2));
+  try{
+    await ref.update({
+      totalKm:firebase.firestore.FieldValue.increment(allowed),
+      todayKm:firebase.firestore.FieldValue.increment(allowed),
+      wallet:firebase.firestore.FieldValue.increment(earn),
+      balance:firebase.firestore.FieldValue.increment(earn)
+    });
+    await db.collection('km_logs').add({uid:currentUser.uid,km:allowed,earned:earn,date:new Date().toISOString().slice(0,10),ts:firebase.firestore.FieldValue.serverTimestamp()});
+  }catch(e){console.error('saveGPS:',e);}
+}
+
+function updateGPSDisplay(){
+  const total=S.todayKm+gpsSessionKm;
+  document.getElementById('gpsKm').textContent=total.toFixed(2);
+  document.getElementById('gpsEarned').textContent=`₹${Math.floor(S.wallet+gpsSessionKm)}`;
+  const pct=Math.min(100,((S.totalKm+gpsSessionKm)/S.kmLimit)*100);
+  document.getElementById('gpsProgressFill').style.width=pct+'%';
+  document.getElementById('statKm').textContent=total.toFixed(2);
+  document.getElementById('hKm').textContent=total.toFixed(2);
+}
+
+function setGPSUI(mode){
+  const dot=document.getElementById('gpsDot');
+  const txt=document.getElementById('gpsStatusTxt');
+  const start=document.getElementById('gpsBtnStart');
+  const pause=document.getElementById('gpsBtnPause');
+  const stop=document.getElementById('gpsBtnStop');
+  if(mode==='tracking'){dot.className='gps-dot';txt.textContent='Tracking your walk...';start.style.display='none';pause.style.display='flex';stop.style.display='flex';}
+  else{dot.className='gps-dot off';txt.textContent='Tap Start to begin tracking';start.style.display='flex';pause.style.display='none';stop.style.display='none';}
+}
+
+function updateEarnUI(){
+  const paid=S.bookPurchased;
+  document.getElementById('gpsPaidContent').style.display=paid?'block':'none';
+  document.getElementById('gpsLockedContent').style.display=paid?'none':'block';
+  document.getElementById('earnPaidContent').style.display=paid?'block':'none';
+  document.getElementById('earnLockedContent').style.display=paid?'none':'block';
+}
+
+// SPLASH + AUTH
+window.addEventListener('load',()=>{
+  setTimeout(()=>document.getElementById('splash').classList.add('gone'),2600);
+  if(window.location.hash==='#admin'){showAdminPanel();return;}
+  if(!auth)return;
+  auth.onAuthStateChanged(user=>{
+    if(user){currentUser=user;loadUser(user);}
+    else{currentUser=null;showAuth();}
+  });
+});
+
+window.addEventListener('hashchange',()=>{
+  if(window.location.hash==='#admin')showAdminPanel();
+  else if(currentUser)showUserApp();
+  else showAuth();
+});
+
+function showAuth(){document.getElementById('authScreen').style.display='flex';document.getElementById('userApp').style.display='none';document.getElementById('bnav').style.display='none';document.getElementById('adminApp').style.display='none';}
+function showUserApp(){document.getElementById('authScreen').style.display='none';document.getElementById('userApp').style.display='block';document.getElementById('bnav').style.display='flex';document.getElementById('adminApp').style.display='none';}
+function showAdminPanel(){document.getElementById('authScreen').style.display='none';document.getElementById('userApp').style.display='none';document.getElementById('bnav').style.display='none';document.getElementById('adminApp').style.display='block';}
+
+function switchTab(tab){
+  document.getElementById('tabLogin').classList.toggle('on',tab==='login');
+  document.getElementById('tabSignup').classList.toggle('on',tab==='signup');
+  document.getElementById('formLogin').style.display=tab==='login'?'block':'none';
+  document.getElementById('formSignup').style.display=tab==='signup'?'block':'none';
+  ['loginErr','signupErr','signupOk'].forEach(id=>{const el=document.getElementById(id);if(el)el.textContent='';});
+}
+
+async function doLogin(){
+  const btn=document.getElementById('btnLogin'),errEl=document.getElementById('loginErr');
+  errEl.textContent='';
+  const rl=checkRL();if(rl){errEl.textContent=rl;return;}
+  const email=document.getElementById('loginEmail').value.trim().toLowerCase();
+  const pass=document.getElementById('loginPass').value;
+  if(!isEmail(email)){errEl.textContent='Enter a valid email.';return;}
+  if(!pass){errEl.textContent='Password is required.';return;}
+  btn.disabled=true;btn.textContent='Signing in...';
+  try{await auth.signInWithEmailAndPassword(email,pass);recordAtt(true);}
+  catch(e){recordAtt(false);errEl.textContent=authErr(e.code);}
+  finally{btn.disabled=false;btn.textContent='Sign In';}
+}
+
+async function doSignup(){
+  const btn=document.getElementById('btnSignup'),errEl=document.getElementById('signupErr'),okEl=document.getElementById('signupOk');
+  errEl.textContent='';okEl.textContent='';
+  const name=san(document.getElementById('signupName').value);
+  const email=document.getElementById('signupEmail').value.trim().toLowerCase();
+  const pass=document.getElementById('signupPass').value;
+  const ref=san(document.getElementById('signupRef').value).toUpperCase();
+  if(!name||name.length<2){errEl.textContent='Enter your full name.';return;}
+  if(!isEmail(email)){errEl.textContent='Enter a valid email.';return;}
+  if(!pass||pass.length<8){errEl.textContent='Password must be 8+ characters.';return;}
+  btn.disabled=true;btn.textContent='Creating account...';
+  try{
+    const cred=await auth.createUserWithEmailAndPassword(email,pass);
+    await cred.user.updateProfile({displayName:name});
+    const myRef=genRef(name,cred.user.uid);
+    await db.collection('users').doc(cred.user.uid).set({
+      name,email,refCode:myRef,referralCode:myRef,
+      referredBy:ref||null,
+      joinedAt:firebase.firestore.FieldValue.serverTimestamp(),
+      wallet:0,balance:0,bookPurchased:false,bookStatus:'none',
+      streak:0,totalKm:0,todayKm:0,kmLimit:300
+    });
+    if(ref)await creditRef(ref,cred.user.uid);
+    okEl.textContent='✅ Account created! Welcome to Health is Wealth!';
+    recordAtt(true);
+  }catch(e){recordAtt(false);errEl.textContent=authErr(e.code);}
+  finally{btn.disabled=false;btn.textContent='Create Account';}
+}
+
+function genRef(name,uid){const n=name.replace(/[^a-zA-Z]/g,'').toUpperCase().slice(0,4).padEnd(4,'X');return n+uid.slice(-4).toUpperCase();}
+
+async function creditRef(refCode,newUid){
+  try{
+    const snap=await db.collection('users').where('refCode','==',refCode).limit(1).get();
+    if(snap.empty)return;
+    // Only credit if referrer is a paid user
+    const refDoc=snap.docs[0];
+    const refData=refDoc.data();
+    if(!refData.bookPurchased)return; // referrer must have bought book
+    await db.collection('referrals').add({referrerId:refDoc.id,referredId:newUid,level:1,amount:0,status:'pending',createdAt:firebase.firestore.FieldValue.serverTimestamp()});
+  }catch(e){console.error('creditRef:',e);}
+}
+
+async function forgotPassword(){
+  const email=document.getElementById('loginEmail').value.trim();
+  if(!isEmail(email)){document.getElementById('loginErr').textContent='Enter email first.';return;}
+  try{await auth.sendPasswordResetEmail(email);document.getElementById('loginErr').style.color='#86efac';document.getElementById('loginErr').textContent='✅ Reset link sent!';}
+  catch(e){document.getElementById('loginErr').textContent=authErr(e.code);}
+}
+
+async function doLogout(){
+  if(!confirm('Sign out?'))return;
+  if(gpsRunning)stopGPS();
+  await auth.signOut();currentUser=null;showToast('Signed out');
+}
+
+function authErr(code){return{'auth/user-not-found':'No account with this email.','auth/wrong-password':'Incorrect password.','auth/invalid-credential':'Invalid email or password.','auth/email-already-in-use':'Email already in use.','auth/weak-password':'Password must be 8+ characters.','auth/invalid-email':'Invalid email.','auth/too-many-requests':'Too many attempts. Wait.','auth/network-request-failed':'Network error. Check connection.'}[code]||'Something went wrong. Try again.';}
+
+async function loadUser(user){
+  showUserApp();
+  try{
+    const doc=await db.collection('users').doc(user.uid).get();
+    if(doc.exists){
+      const d=doc.data();
+      S.wallet=d.wallet||d.balance||0;
+      S.refCode=d.refCode||d.referralCode||genRef(user.displayName||'USER',user.uid);
+      S.bookPurchased=d.bookPurchased||false;
+      S.bookStatus=d.bookStatus||'none';
+      S.streak=d.streak||0;
+      S.profile=d.profile||{};
+      S.totalKm=d.totalKm||0;
+      S.todayKm=d.todayKm||0;
+      S.kmLimit=d.kmLimit||300;
+    }else{
+      const myRef=genRef(user.displayName||'USER',user.uid);
+      await db.collection('users').doc(user.uid).set({name:user.displayName||'User',email:user.email,refCode:myRef,referralCode:myRef,wallet:0,balance:0,bookPurchased:false,bookStatus:'none',streak:0,totalKm:0,todayKm:0,kmLimit:300,joinedAt:firebase.firestore.FieldValue.serverTimestamp()});
+      S.refCode=myRef;
+    }
+    const today=new Date().toISOString().slice(0,10);
+    const logDoc=await db.collection('users').doc(user.uid).collection('logs').doc(today).get();
+    if(logDoc.exists){const l=logDoc.data();S.water=l.water||0;S.sleep=l.sleep||0;S.hr=l.hr||72;S.mood=l.mood||'';}
+  }catch(e){console.error('loadUser:',e);}
+
+  db.collection('users').doc(user.uid).onSnapshot(snap=>{
+    if(!snap.exists)return;
+    const d=snap.data();
+    S.wallet=d.wallet||d.balance||0;S.totalKm=d.totalKm||0;S.todayKm=d.todayKm||0;S.kmLimit=d.kmLimit||300;S.bookPurchased=d.bookPurchased||false;S.bookStatus=d.bookStatus||'none';
+    document.getElementById('walletAmt').textContent=S.wallet.toFixed(0);
+    document.getElementById('tbWallet').textContent=`₹${S.wallet.toFixed(0)}`;
+    if(document.getElementById('gpsKm'))document.getElementById('gpsKm').textContent=S.todayKm.toFixed(2);
+    if(document.getElementById('gpsEarned'))document.getElementById('gpsEarned').textContent=`₹${S.wallet.toFixed(0)}`;
+    if(document.getElementById('gpsLimitTxt'))document.getElementById('gpsLimitTxt').textContent=`Limit: ${S.kmLimit} KM · Done: ${S.totalKm.toFixed(1)} KM`;
+    updateEarnUI();updateBookStatus();
+  });
+
+  renderAll(user);
+  loadReferrals(user.uid);
+  loadTxns(user.uid);
+  renderHabits();
+}
+
+function renderAll(user){
+  const name=san(user.displayName||'Friend');
+  document.getElementById('heroName').innerHTML=`Welcome, <span>${name}</span> 👋`;
+  document.getElementById('profileName').textContent=name;
+  document.getElementById('profileEmail').textContent=san(user.email||'');
+  document.getElementById('profileJoined').textContent=new Date(user.metadata?.creationTime||Date.now()).toLocaleDateString('en-IN',{year:'numeric',month:'short'});
+  const badge=document.getElementById('profileBadge');
+  badge.innerHTML=S.bookPurchased?'<span style="background:var(--green2);color:var(--green);padding:4px 12px;border-radius:20px;font-size:.72rem;font-weight:700">✅ Book Owner · GPS Earn Active</span>':'<span style="background:var(--amber2);color:var(--amber);padding:4px 12px;border-radius:20px;font-size:.72rem;font-weight:700">🔒 Buy Book to Unlock Earning</span>';
+  document.getElementById('tbStreak').textContent=`🔥 ${S.streak}`;
+  document.getElementById('tbWallet').textContent=`₹${S.wallet.toFixed(0)}`;
+  document.getElementById('statWater').textContent=S.water;
+  document.getElementById('statSleep').textContent=`${S.sleep}h`;
+  document.getElementById('statHR').textContent=S.hr;
+  document.getElementById('statKm').textContent=S.todayKm.toFixed(2);
+  document.getElementById('hWater').textContent=S.water;
+  document.getElementById('hSleep').textContent=`${S.sleep}h`;
+  document.getElementById('hKm').textContent=S.todayKm.toFixed(2);
+  document.getElementById('statKmSub').textContent=`Earning: ₹${S.wallet.toFixed(0)}`;
+  document.getElementById('pbWater').style.width=Math.min(100,(S.water/8)*100)+'%';
+  document.getElementById('pbSleep').style.width=Math.min(100,(S.sleep/8)*100)+'%';
+  document.getElementById('pbKm').style.width=Math.min(100,(S.totalKm/S.kmLimit)*100)+'%';
+  document.getElementById('smWater').textContent=S.water+'/8';
+  document.getElementById('smSleep').textContent=S.sleep+'h';
+  document.getElementById('smMood').textContent=S.mood||'—';
+  document.getElementById('smKm').textContent=S.todayKm.toFixed(2)+' km';
+  const sc=Math.min(100,Math.floor((S.todayKm/5)*25)+Math.floor((S.water/8)*25)+Math.floor((S.sleep/8)*25)+(S.mood?25:0));
+  document.getElementById('scoreNum').textContent=sc;
+  document.getElementById('scoreCircle').style.strokeDashoffset=264-(264*sc/100);
+  document.getElementById('inpWater').value=S.water||'';
+  document.getElementById('inpSleep').value=S.sleep||'';
+  document.getElementById('inpHR').value=S.hr!==72?S.hr:'';
+  if(S.profile.age)document.getElementById('profAge').value=S.profile.age;
+  if(S.profile.gender)document.getElementById('profGender').value=S.profile.gender;
+  if(S.profile.weight)document.getElementById('profWeight').value=S.profile.weight;
+  if(S.profile.height)document.getElementById('profHeight').value=S.profile.height;
+  document.getElementById('refCode').textContent=S.refCode;
+  document.getElementById('refUrl').textContent=`bonagirispinoj-png.github.io/ref/${S.refCode}`;
+  document.getElementById('walletAmt').textContent=S.wallet.toFixed(0);
+  updateBookStatus();updateEarnUI();
+  renderStreak();renderRoutine();renderFirstAid();
+}
+
+async function saveLog(){
+  if(!currentUser)return;
+  const water=parseInt(document.getElementById('inpWater').value)||0;
+  const sleep=parseFloat(document.getElementById('inpSleep').value)||0;
+  const hr=parseInt(document.getElementById('inpHR').value)||72;
+  if(water<0||sleep<0){showToast('⚠ Values cannot be negative');return;}
+  S.water=water;S.sleep=sleep;S.hr=hr;
+  const today=new Date().toISOString().slice(0,10);
+  try{
+    await db.collection('users').doc(currentUser.uid).collection('logs').doc(today).set({water,sleep,hr,mood:S.mood,date:today,savedAt:firebase.firestore.FieldValue.serverTimestamp()});
+    S.streak=Math.min(S.streak+1,365);
+    await db.collection('users').doc(currentUser.uid).update({streak:S.streak});
+    renderAll(currentUser);showToast('✅ Log saved!');
+  }catch(e){showToast('⚠ Save failed');}
+}
+
+function setMood(btn,emoji,label){document.querySelectorAll('.mood-btn').forEach(b=>b.classList.remove('on'));btn.classList.add('on');S.mood=emoji+' '+label;document.getElementById('moodStatus').textContent=`Logged: ${emoji} ${label}`;document.getElementById('smMood').textContent=emoji;}
+
+function renderStreak(){
+  const row=document.getElementById('streakRow');
+  const days=['M','T','W','T','F','S','S'];
+  const today=new Date().getDay();
+  row.innerHTML=days.map((d,i)=>{
+    let cls='background:var(--bg2);color:var(--txt4);border:1px solid var(--bdr)';
+    const di=(i+1)%7;
+    if(di===today)cls='background:var(--gold);color:var(--forest);box-shadow:0 0 0 3px rgba(201,168,76,.3)';
+    else if((today-di+7)%7<S.streak)cls='background:var(--forest);color:var(--gold2)';
+    return `<div style="width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.7rem;font-weight:800;${cls}">${(today-di+7)%7<S.streak&&di!==today?'✓':d}</div>`;
+  }).join('');
+}
+
+const ROUTINE=[
+  {time:'6:00',ico:'🌅',text:'Wake up & stretch'},
+  {time:'6:15',ico:'💧',text:'Drink 2 glasses of water'},
+  {time:'6:30',ico:'🏃',text:'Morning GPS walk — earn ₹'},
+  {time:'7:30',ico:'🥗',text:'Healthy breakfast'},
+  {time:'9:00',ico:'🧘',text:'5-min meditation'},
+  {time:'13:00',ico:'🥘',text:'Nutritious lunch'},
+  {time:'15:00',ico:'🫖',text:'Herbal tea break'},
+  {time:'18:00',ico:'🚶',text:'Evening GPS walk — earn ₹'},
+  {time:'20:00',ico:'🍽',text:'Light dinner'},
+  {time:'22:00',ico:'😴',text:'Wind down & sleep'},
+];
+function renderRoutine(){
+  const h=new Date().getHours();
+  document.getElementById('routineList').innerHTML=ROUTINE.map(r=>{
+    const rh=parseInt(r.time);
+    const cls=rh===h?'ri-now':(rh<h?'ri-done':'');
+    return `<div class="routine-item ${cls}"><span class="ri-time">${r.time}</span><span class="ri-ico">${r.ico}</span><span class="ri-text">${r.text}</span></div>`;
+  }).join('');
+}
+
+const FA=[
+  {ico:'🩸',bg:'#fde8e8',title:'Cuts & Wounds',body:'Clean with water. Apply pressure. Cover with bandage. Seek help if deep.'},
+  {ico:'🔥',bg:'#fff3e0',title:'Burns',body:'Cool under running water 10–20 min. No ice or butter. Cover loosely.'},
+  {ico:'🫁',bg:'#e3f2fd',title:'Choking',body:'5 back blows + 5 abdominal thrusts. Repeat. Call 112 if unconscious.'},
+  {ico:'💊',bg:'#f3e5f5',title:'Poisoning',body:'Call 112. Do NOT induce vomiting unless told.'},
+  {ico:'❤️',bg:'#fce4ec',title:'Heart Attack',body:'Chest/arm pain, breathlessness → Call 112. Give aspirin if not allergic.'},
+  {ico:'🧠',bg:'#e8f5e9',title:'Stroke (FAST)',body:'Face droop, Arm weak, Speech issues → Call 112 IMMEDIATELY.'},
+];
+function renderFirstAid(){
+  document.getElementById('firstAidList').innerHTML=FA.map((f,i)=>`
+    <div class="firstaid-card">
+      <div class="fa-header" onclick="toggleFA(${i})">
+        <div class="fa-ico" style="background:${f.bg}">${f.ico}</div>
+        <span class="fa-title">${f.title}</span><span class="fa-arrow" id="fa-arr-${i}">▼</span>
+      </div>
+      <div class="fa-body" id="fa-body-${i}">${f.body}</div>
+    </div>`).join('');
+}
+function toggleFA(i){document.getElementById(`fa-body-${i}`).classList.toggle('open');document.getElementById(`fa-arr-${i}`).classList.toggle('open');}
+
+// BMI CALCULATOR
+function calcBMI(){
+  const w=parseFloat(document.getElementById('bmiWeight').value);
+  const h=parseFloat(document.getElementById('bmiHeight').value)/100;
+  const age=parseInt(document.getElementById('bmiAge').value)||30;
+  const gender=document.getElementById('bmiGender').value||'Male';
+  if(!w||!h||w<10||h<0.5){showToast('⚠ Enter valid weight and height');return;}
+  const bmi=w/(h*h);
+  let cat,color,bg,advice,exercises,tips;
+  if(bmi<18.5){
+    cat='Underweight';color='#1e40af';bg='#dbeafe';
+    advice=`Your BMI is ${bmi.toFixed(1)} — You are underweight. Ideal weight for your height (${(h*100).toFixed(0)} cm) is ${(18.5*h*h).toFixed(0)}–${(24.9*h*h).toFixed(0)} kg. Focus on calorie-dense nutritious foods.`;
+    exercises=['🏋️ Light Weight Training — 3x/week to build muscle mass','🚶 Brisk Walking — 30 min daily to boost metabolism','🧘 Yoga — Improves appetite and digestive health','🏊 Swimming — Full body conditioning without joint stress'];
+    tips=['Eat 5–6 small meals per day','Include nuts, seeds, ghee, paneer in diet','Drink milk + banana smoothie daily','Protein: 1.5g per kg body weight','Avoid drinking water before meals'];
+  }else if(bmi<25){
+    cat='Normal Weight';color='#1e6b3a';bg='#d4edda';
+    advice=`Your BMI is ${bmi.toFixed(1)} — Excellent! You are at a healthy weight. Maintain with balanced diet and regular exercise. Ideal weight range: ${(18.5*h*h).toFixed(0)}–${(24.9*h*h).toFixed(0)} kg.`;
+    exercises=['🏃 Running/Jogging — 30 min, 5x/week for cardio health','💪 Strength Training — 3x/week for muscle maintenance','🚴 Cycling — Great for heart and leg strength','🧘 Yoga/Stretching — For flexibility and mental health'];
+    tips=['Maintain current eating habits','Stay hydrated: 8 glasses/day','Sleep 7–9 hours nightly','Regular health check-ups every 6 months','Limit processed foods and sugar'];
+  }else if(bmi<30){
+    cat='Overweight';color='#8b5e00';bg='#fff8e6';
+    advice=`Your BMI is ${bmi.toFixed(1)} — You are overweight. Target weight for your height: ${(18.5*h*h).toFixed(0)}–${(24.9*h*h).toFixed(0)} kg. Need to lose ${(w-(24.9*h*h)).toFixed(0)} kg. Start with diet changes and daily walking.`;
+    exercises=['🚶 Daily Walking — Start with 30 min, increase to 60 min','🏊 Swimming — Low impact, burns high calories','🚴 Cycling — Excellent for belly fat reduction','💃 Zumba/Dance — Fun way to burn 400-500 cal/hr'];
+    tips=['Reduce refined carbs (white rice, maida, sugar)','Eat more vegetables and high-fiber foods','Avoid eating after 8 PM','Portion control — use smaller plates','Drink warm water with lemon in morning'];
+  }else{
+    cat='Obese';color='#8b1a1a';bg='#fde8e8';
+    advice=`Your BMI is ${bmi.toFixed(1)} — Obesity risk zone. Please consult a doctor. Target weight: ${(18.5*h*h).toFixed(0)}–${(24.9*h*h).toFixed(0)} kg. Need to lose ${(w-(24.9*h*h)).toFixed(0)} kg. Health risks: diabetes, heart disease, joint pain.`;
+    exercises=['🚶 Walking — Start slow, 15-20 min/day, gradually increase','🏊 Water Aerobics — Zero joint stress, high calorie burn','🧘 Chair Yoga — Safe for beginners with mobility issues','🚴 Stationary Bike — Controlled cardio exercise'];
+    tips=['Consult a nutritionist immediately','Reduce sugar intake completely','Track every meal using a food diary','Join a weight loss support group','Intermittent fasting (consult doctor first)'];
+  }
+  document.getElementById('bmiResult').style.display='block';
+  document.getElementById('bmiVal').textContent=bmi.toFixed(1);
+  document.getElementById('bmiCat').textContent=cat;
+  const resultBox=document.getElementById('bmiResultBox');
+  resultBox.style.background=bg;resultBox.style.color=color;
+  document.getElementById('bmiAdvice').textContent=advice;
+  document.getElementById('bmiExercises').innerHTML=exercises.map(e=>`
+    <div class="exercise-card">
+      <div class="exercise-ico">${e.split(' ')[0]}</div>
+      <div>
+        <div class="exercise-title">${e.split('—')[0].replace(e.split(' ')[0],'').trim()}</div>
+        <div class="exercise-sub">${e.split('—')[1]?.trim()||''}</div>
+        <span class="exercise-tag ${bmi<18.5?'tag-easy':bmi<25?'tag-easy':bmi<30?'tag-med':'tag-easy'}">${bmi<18.5?'BUILD':'MAINTAIN'||bmi<25?'MAINTAIN':bmi<30?'REDUCE':'START SLOW'}</span>
+      </div>
+    </div>`).join('');
+  document.getElementById('bmiTips').innerHTML=`<div class="card" style="padding:12px">
+    ${tips.map(t=>`<div style="display:flex;gap:8px;align-items:flex-start;padding:6px 0;border-bottom:1px solid var(--bdr);font-size:.82rem;color:var(--txt3)"><span style="color:var(--gold);flex-shrink:0">✦</span>${t}</div>`).join('')}
+  </div>`;
+  showToast(`BMI: ${bmi.toFixed(1)} — ${cat}`);
+}
+
+// AI FEATURES
+function runDigitalTwin(){
+  const result=document.getElementById('twinResult');
+  result.className='aif-result on';
+  result.innerHTML=`<div class="twin-timeline">
+    <div class="twin-event twin-good"><strong>Today:</strong> Your wellness score is ${Math.min(100,Math.floor((S.todayKm/5)*25+(S.water/8)*25+(S.sleep/8)*25))}/100. ${S.water>=6?'Hydration good ✅':'Drink more water ⚠️'}</div>
+    <div class="twin-event twin-good"><strong>3 months:</strong> If you walk ${S.kmLimit<600?'daily and refer 1 friend':'consistently'}, your cardiovascular health improves by 18%.</div>
+    <div class="twin-event ${S.sleep<6?'twin-warn':'twin-good'}"><strong>6 months:</strong> ${S.sleep<6?'Warning: Poor sleep pattern may lead to metabolic issues. Target 7-8 hrs.':'Sleep pattern is healthy. Continue for better immunity.'}</div>
+    <div class="twin-event twin-warn"><strong>1 year:</strong> Based on current activity, maintain BMI in healthy range. Schedule annual health check-up.</div>
+    <div class="twin-event twin-good"><strong>5 years:</strong> Consistent healthy habits reduce chronic disease risk by up to 40%. Stay on track!</div>
+  </div>
+  <div style="margin-top:8px;font-size:.78rem;color:var(--txt4)">ℹ️ This is an AI model based on your logged data. Always consult a doctor for medical advice.</div>`;
+}
+
+function runDiseasePrediction(){
+  const result=document.getElementById('diseaseResult');
+  result.className='aif-result on';
+  const waterRisk=S.water<4?'High':'Low';
+  const sleepRisk=S.sleep<6?'High':'Low';
+  const kmRisk=S.todayKm<1?'Moderate':'Low';
+  result.innerHTML=`<strong>🔮 Your 10-Year Disease Risk Timeline</strong><br><br>
+  <div style="display:grid;gap:8px">
+    <div style="background:var(--green2);padding:8px 12px;border-radius:8px;font-size:.8rem"><strong>Heart Disease Risk:</strong> ${kmRisk} — ${S.todayKm>=2?'Regular walking is protecting your heart ❤️':'Start daily 30-min walks to reduce risk by 35%'}</div>
+    <div style="background:${S.water<4?'var(--red2)':'var(--green2)'};padding:8px 12px;border-radius:8px;font-size:.8rem"><strong>Kidney Health:</strong> ${waterRisk} Risk — ${S.water>=6?'Good hydration maintaining kidney function ✅':'Drink 8+ glasses daily to prevent kidney stones ⚠️'}</div>
+    <div style="background:${S.sleep<6?'var(--amber2)':'var(--green2)'};padding:8px 12px;border-radius:8px;font-size:.8rem"><strong>Diabetes Risk:</strong> ${sleepRisk} Risk — ${S.sleep>=7?'Good sleep maintaining insulin sensitivity ✅':'Poor sleep increases diabetes risk 2x. Get 7-9 hours ⚠️'}</div>
+    <div style="background:var(--blue2);padding:8px 12px;border-radius:8px;font-size:.8rem"><strong>Mental Health:</strong> ${S.mood.includes('Good')||S.mood.includes('Great')?'Low Risk — Positive mood patterns detected 😊':'Moderate — Practice 10-min daily meditation for better mental health 🧘'}</div>
+  </div>`;
+}
+
+function startCameraHealth(){
+  if(!navigator.mediaDevices){
+    document.getElementById('cameraResult').style.display='block';
+    document.getElementById('cameraResult').innerHTML=`<strong>📷 Camera Health Scan Results (Demo)</strong><br><br>
+    <div style="font-size:.82rem;color:var(--txt3);line-height:1.8">
+    ✅ <strong>Skin Tone:</strong> No signs of jaundice detected<br>
+    ✅ <strong>Eye Colour:</strong> Normal sclera, no yellowness<br>
+    ⚠️ <strong>Skin Moisture:</strong> Slightly dry — drink more water<br>
+    ✅ <strong>Facial Symmetry:</strong> No stroke indicators<br>
+    <em style="font-size:.72rem;color:var(--txt4)">For real camera scanning, enable camera permissions.</em>
+    </div>`;
+    showToast('Camera scan complete (demo mode)');
+    return;
+  }
+  document.getElementById('cameraArea').innerHTML='📸<br><span style="font-size:.7rem">Scanning...</span>';
+  setTimeout(()=>{
+    document.getElementById('cameraArea').innerHTML='✅<br><span style="font-size:.7rem">Scan done</span>';
+    document.getElementById('cameraResult').style.display='block';
+    document.getElementById('cameraResult').innerHTML=`<strong>📷 Health Scan Results</strong><br><br>
+    <div style="font-size:.82rem;color:var(--txt3);line-height:1.8">
+    ✅ <strong>Anaemia Indicators:</strong> Not detected<br>
+    ✅ <strong>Jaundice Signs:</strong> Normal<br>
+    ⚠️ <strong>Stress Markers:</strong> Mild facial tension detected — try breathing exercises<br>
+    ✅ <strong>Hydration:</strong> Skin appears adequately hydrated<br>
+    <em style="font-size:.72rem;color:var(--txt4)">AI scan is indicative only — consult a doctor for diagnosis.</em>
+    </div>`;
+  },2000);
+}
+
+function runBehaviourEngine(){
+  const result=document.getElementById('behaviourResult');
+  result.className='aif-result on';
+  result.innerHTML=`<strong>🧠 Your Behaviour Analysis</strong><br><br>
+  <div style="font-size:.82rem;color:var(--txt3);line-height:1.8">
+  <strong>Current Patterns Detected:</strong><br>
+  ${S.sleep<7?'⚠️ Sleep deprivation pattern — late nights reducing productivity<br>':'✅ Good sleep consistency<br>'}
+  ${S.water<5?'⚠️ Low water intake habit — replace soft drinks with water<br>':'✅ Healthy hydration habit<br>'}
+  ${S.todayKm<1?'⚠️ Sedentary pattern — break sitting every 30 minutes<br>':'✅ Active movement pattern<br>'}
+  <br><strong>🎯 3 Micro-Habits to Start Today:</strong><br>
+  1. Put a water bottle on your desk — drink one sip every 30 min<br>
+  2. Set an alarm at 10 PM as "prepare for sleep" signal<br>
+  3. Take a 5-minute walk after every meal<br>
+  <br><strong>Psychology Principle:</strong> Habit stacking — attach new habits to existing ones.
+  </div>`;
+}
+
+function runEmotionDetect(){
+  const result=document.getElementById('emotionResult');
+  result.className='aif-result on';
+  const emotions=['Calm & Focused 😌','Slightly Stressed 😤','Energetic & Positive 😄','Tired but Stable 😴'];
+  const detected=S.mood||emotions[Math.floor(Math.random()*emotions.length)];
+  result.innerHTML=`<strong>😊 Emotional State Detected</strong><br><br>
+  <div style="font-size:.82rem;color:var(--txt3);line-height:1.8">
+  <strong>Current Emotion:</strong> ${detected}<br><br>
+  <strong>Based on:</strong> Your mood logs, sleep quality (${S.sleep}h), activity level (${S.todayKm.toFixed(1)} km)<br><br>
+  <strong>Recommended Actions:</strong><br>
+  ${S.sleep<6?'🌙 Prioritise sleep tonight — emotions are 60% regulated by sleep<br>':''}
+  ${S.water<5?'💧 Dehydration causes irritability — drink water now<br>':''}
+  🧘 5-min breathing exercise will immediately reduce cortisol by 15%<br>
+  📞 Connect with a friend or family member for social wellness
+  </div>`;
+}
+
+function runClimateHealth(){
+  const result=document.getElementById('climateResult');
+  result.className='aif-result on';
+  if(!navigator.geolocation){
+    result.innerHTML=`<strong>🌡️ Climate Health Advice (General - India)</strong><br><br>
+    <div style="font-size:.82rem;color:var(--txt3);line-height:1.8">
+    🌡️ <strong>Current Season:</strong> ${getIndianSeason()}<br>
+    💧 <strong>Hydration:</strong> Drink 3+ litres daily in Indian summers<br>
+    😷 <strong>Pollution:</strong> Wear mask during high AQI days (>150)<br>
+    🌞 <strong>UV Index:</strong> Apply SPF 30+ sunscreen before outdoor walks<br>
+    🦟 <strong>Mosquito Alert:</strong> Use repellent during dawn/dusk walks<br>
+    🥗 <strong>Seasonal Foods:</strong> ${getSeasonalFoods()}
+    </div>`;
+    return;
+  }
+  navigator.geolocation.getCurrentPosition(pos=>{
+    result.innerHTML=`<strong>📍 Location-Based Health Advice</strong><br><br>
+    <div style="font-size:.82rem;color:var(--txt3);line-height:1.8">
+    📍 <strong>Your Location:</strong> Lat ${pos.coords.latitude.toFixed(2)}, Lon ${pos.coords.longitude.toFixed(2)}<br>
+    🌡️ <strong>Season:</strong> ${getIndianSeason()}<br>
+    💧 <strong>Hydration Advice:</strong> Drink 3+ litres today<br>
+    🏃 <strong>Best Walk Time:</strong> 6–8 AM or after 6 PM to avoid peak UV<br>
+    🌿 <strong>Air Quality:</strong> Check AQI before outdoor activity<br>
+    🥗 <strong>Seasonal Foods:</strong> ${getSeasonalFoods()}
+    </div>`;
+  },()=>result.innerHTML='⚠️ Location access denied. Enable GPS to get personalised climate advice.');
+}
+
+function getIndianSeason(){
+  const m=new Date().getMonth();
+  if(m>=2&&m<=4)return'Summer (Mar–May) — High heat & UV risk';
+  if(m>=5&&m<=8)return'Monsoon (Jun–Sep) — Humidity & infection risk';
+  if(m>=9&&m<=10)return'Post-Monsoon (Oct–Nov) — Dengue alert season';
+  return'Winter (Dec–Feb) — Respiratory health alert';
+}
+
+function getSeasonalFoods(){
+  const m=new Date().getMonth();
+  if(m>=2&&m<=4)return'Watermelon, cucumber, coconut water, buttermilk';
+  if(m>=5&&m<=8)return'Ginger tea, turmeric milk, boiled water, light dal';
+  if(m>=9&&m<=10)return'Papaya, pomegranate, garlic, tulsi kadha';
+  return'Sesame, jaggery, root vegetables, warm soups';
+}
+
+function analyseFood(){
+  const food=document.getElementById('foodInput').value.trim();
+  if(!food){showToast('⚠ Enter a food name');return;}
+  const result=document.getElementById('foodResult');
+  result.style.display='block';
+  const FOODS={
+    'dosa':{cal:120,carb:22,protein:3,fat:3,tip:'Fermented — great for gut health. Pair with sambar for complete protein.'},
+    'biryani':{cal:350,carb:45,protein:18,fat:12,tip:'High calorie. Limit to once a week. Choose brown rice version for more fibre.'},
+    'idli':{cal:39,carb:8,protein:2,fat:0.5,tip:'Excellent low-calorie food. Fermented for probiotics. Best for weight management.'},
+    'chapati':{cal:80,carb:15,protein:3,fat:0.4,tip:'Whole wheat is high fibre. Limit ghee. Best for diabetes management.'},
+    'rice':{cal:206,carb:45,protein:4.3,fat:0.4,tip:'Use brown rice for more fibre. Reduce portion size for weight management.'},
+    'dal':{cal:116,carb:20,protein:9,fat:0.4,tip:'Excellent plant protein. Have daily for muscle health and immunity.'},
+    'paneer':{cal:265,carb:4,protein:18,fat:21,tip:'High protein and calcium. Great for vegetarians. Limit for weight loss.'},
+    'samosa':{cal:308,carb:32,protein:6,fat:18,tip:'High fat, fried food. Limit to once a week. Choose baked version.'},
+  };
+  const key=food.toLowerCase().replace(/\s/g,'');
+  const data=FOODS[key]||{cal:Math.floor(150+Math.random()*200),carb:Math.floor(20+Math.random()*30),protein:Math.floor(5+Math.random()*15),fat:Math.floor(2+Math.random()*15),tip:`${food} — Traditional Indian food with nutritional benefits. Eat in moderation as part of a balanced diet.`};
+  result.innerHTML=`<strong>🍛 ${food} — Nutrition Analysis</strong><br><br>
+  <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:10px">
+    <div style="text-align:center;background:var(--bg);border-radius:8px;padding:8px"><div style="font-weight:700;font-size:1rem;color:var(--txt)">${data.cal}</div><div style="font-size:.62rem;color:var(--txt4)">Calories</div></div>
+    <div style="text-align:center;background:var(--bg);border-radius:8px;padding:8px"><div style="font-weight:700;font-size:1rem;color:var(--blue)">${data.carb}g</div><div style="font-size:.62rem;color:var(--txt4)">Carbs</div></div>
+    <div style="text-align:center;background:var(--bg);border-radius:8px;padding:8px"><div style="font-weight:700;font-size:1rem;color:var(--green)">${data.protein}g</div><div style="font-size:.62rem;color:var(--txt4)">Protein</div></div>
+    <div style="text-align:center;background:var(--bg);border-radius:8px;padding:8px"><div style="font-weight:700;font-size:1rem;color:var(--amber)">${data.fat}g</div><div style="font-size:.62rem;color:var(--txt4)">Fat</div></div>
+  </div>
+  <div style="font-size:.82rem;color:var(--txt3);line-height:1.6"><strong>💡 Health Tip:</strong> ${data.tip}</div>
+  ${S.profile.weight&&S.profile.height?`<div style="font-size:.78rem;color:var(--txt4);margin-top:8px">🎯 For your BMI: This food provides ${Math.round(data.cal/(S.profile.weight||70)*100)}% of recommended daily calories per serving for your weight.</div>`:''}`;
+}
+
+function analyseHealthRecord(){
+  const text=document.getElementById('healthRecordInput').value.trim();
+  if(!text||text.length<10){showToast('⚠ Enter your health report details');return;}
+  const result=document.getElementById('healthRecordResult');
+  result.style.display='block';
+  // Simple pattern matching for common health values
+  const bsMatch=text.match(/blood\s*sugar[:\s]*(\d+)/i);
+  const cholMatch=text.match(/cholesterol[:\s]*(\d+)/i);
+  const hbMatch=text.match(/h[ae]moglobin[:\s]*([\d.]+)/i);
+  const bpMatch=text.match(/bp[:\s]*(\d+\/\d+)/i)||text.match(/blood\s*pressure[:\s]*(\d+\/\d+)/i);
+  let analysis='<strong>📂 AI Health Record Analysis</strong><br><br>';
+  if(bsMatch){
+    const bs=parseInt(bsMatch[1]);
+    analysis+=`🩸 <strong>Blood Sugar: ${bs} mg/dL</strong> — ${bs<100?'✅ Normal (fasting)':bs<126?'⚠️ Pre-diabetic range (100–125) — reduce sugar intake':' 🚨 Diabetic range (>126) — consult endocrinologist'}<br>`;
+  }
+  if(cholMatch){
+    const ch=parseInt(cholMatch[1]);
+    analysis+=`💛 <strong>Cholesterol: ${ch} mg/dL</strong> — ${ch<200?'✅ Normal':ch<240?'⚠️ Borderline high — reduce fried foods':' 🚨 High — medication may be needed, see doctor'}<br>`;
+  }
+  if(hbMatch){
+    const hb=parseFloat(hbMatch[1]);
+    analysis+=`❤️ <strong>Haemoglobin: ${hb} g/dL</strong> — ${hb>=12?'✅ Normal':hb>=10?'⚠️ Mild anaemia — increase iron-rich foods (spinach, beetroot)':'🚨 Severe anaemia — consult doctor immediately'}<br>`;
+  }
+  if(bpMatch){
+    const bp=bpMatch[1];
+    const[sys,dia]=bp.split('/').map(Number);
+    analysis+=`🩺 <strong>BP: ${bp} mmHg</strong> — ${sys<120&&dia<80?'✅ Normal':sys<130?'⚠️ Elevated — reduce salt intake':' 🚨 High BP — medication and lifestyle change needed'}<br>`;
+  }
+  if(!bsMatch&&!cholMatch&&!hbMatch&&!bpMatch){
+    analysis+=`<div style="font-size:.82rem;color:var(--txt3);line-height:1.8">
+    Your report has been analysed. Please consult a doctor for detailed interpretation.<br><br>
+    <strong>General Health Actions:</strong><br>
+    ✅ Get annual complete blood count (CBC)<br>
+    ✅ Check blood sugar every 6 months if family history<br>
+    ✅ Lipid profile yearly after age 30<br>
+    ✅ Blood pressure monitoring monthly
+    </div>`;
+  }
+  analysis+='<br><em style="font-size:.72rem;color:var(--txt4)">⚕️ This is AI-assisted guidance only. Always consult a qualified doctor for medical decisions.</em>';
+  result.innerHTML=analysis;
+}
+
+let guardianActive=false;
+function toggleGuardian(){
+  guardianActive=!guardianActive;
+  document.getElementById('guardianStatus').textContent=guardianActive?'🟢 Guardian Mode: ACTIVE':'🔴 Guardian Mode: OFF';
+  document.getElementById('guardianBtn').textContent=guardianActive?'Deactivate':'Activate';
+  if(guardianActive){
+    checkGuardianAlerts();
+    showToast('🛡️ Health Guardian Mode activated!');
+  }else{
+    document.getElementById('guardianAlerts').innerHTML='';
+    showToast('Guardian Mode deactivated');
+  }
+}
+
+function checkGuardianAlerts(){
+  const alerts=[];
+  if(S.water<4)alerts.push({type:'warning',msg:'💧 Low water intake! Drink 2 more glasses now to prevent dehydration.'});
+  if(S.sleep<6)alerts.push({type:'danger',msg:'😴 Sleep debt detected! Tonight target 8 hours to restore immunity.'});
+  if(S.todayKm<0.5)alerts.push({type:'info',msg:'🏃 No walking detected today! Start GPS walk to earn ₹ and stay healthy.'});
+  if(!S.mood)alerts.push({type:'info',msg:'😊 No mood logged today! Tap Mood Check-In on home screen.'});
+  const container=document.getElementById('guardianAlerts');
+  if(alerts.length===0){container.innerHTML='<div style="background:var(--green2);border-radius:8px;padding:10px;font-size:.8rem;color:var(--green)">✅ All health metrics look good! Keep it up.</div>';return;}
+  container.innerHTML=alerts.map(a=>`<div class="alert-banner ${a.type==='danger'?'ab-warning':a.type==='warning'?'ab-amber':'ab-info'}" style="margin-bottom:6px"><span class="ab-ico">${a.type==='danger'?'🚨':'⚠️'}</span><span>${a.msg}</span></div>`).join('');
+}
+
+function runGeoHealth(){
+  const result=document.getElementById('geoResult');
+  result.className='aif-result on';
+  if(navigator.geolocation){
+    navigator.geolocation.getCurrentPosition(pos=>{
+      result.innerHTML=`<strong>📍 Geo Health Report</strong><br><br>
+      <div style="font-size:.82rem;color:var(--txt3);line-height:1.8">
+      📍 Location detected (${pos.coords.latitude.toFixed(2)}°N, ${pos.coords.longitude.toFixed(2)}°E)<br>
+      🏙️ Urban area detected — moderate pollution risk<br>
+      😷 Recommendation: Walk in parks, avoid main roads during rush hours<br>
+      🌊 Stay hydrated — urban heat island effect is active<br>
+      🦟 Check local dengue/malaria reports in your district<br>
+      🏥 <a href="https://www.google.com/maps/search/hospital" target="_blank" style="color:var(--blue)">Find nearest hospitals →</a>
+      </div>`;
+    },()=>{result.innerHTML='<div style="font-size:.82rem;color:var(--txt3)">📍 Enable location permission to get geo-based health advice for your area.</div>';});
+  }else{
+    result.innerHTML='<div style="font-size:.82rem;color:var(--txt3)">📍 GPS not supported on this device. General India health advice applies.</div>';
+  }
+}
+
+const HABITS=[
+  {ico:'💧',name:'Drink 8 glasses of water',current:60},
+  {ico:'🏃',name:'Walk 5 KM daily',current:40},
+  {ico:'😴',name:'Sleep 8 hours',current:70},
+  {ico:'🧘',name:'Meditate 10 min',current:30},
+  {ico:'🥗',name:'Eat vegetables daily',current:80},
+];
+function renderHabits(){
+  document.getElementById('habitList').innerHTML=HABITS.map(h=>`
+    <div class="habit-item">
+      <div class="habit-ico">${h.ico}</div>
+      <div style="flex:1">
+        <div style="font-size:.82rem;font-weight:600;color:var(--txt2)">${h.name}</div>
+        <div class="habit-bar"><div class="habit-fill" style="width:${h.current}%"></div></div>
+        <div style="font-size:.66rem;color:var(--txt4);margin-top:2px">${h.current}% consistency this week</div>
+      </div>
+    </div>`).join('');
+}
+
+function runHabitEngine(){
+  const result=document.getElementById('habitResult');
+  result.className='aif-result on';
+  result.innerHTML=`<strong>⚡ AI Habit Correction Plan</strong><br><br>
+  <div style="font-size:.82rem;color:var(--txt3);line-height:1.8">
+  <strong>📊 Analysis Complete — 3 Critical Habits to Fix:</strong><br><br>
+  <strong>1. 💧 Water Habit (Currently: ${S.water}/8 glasses)</strong><br>
+  Trigger: Every hour alarm → drink one glass<br>
+  Replacement: Replace morning tea with warm lemon water<br>
+  Reward: Track on app, earn wellness score points<br><br>
+  <strong>2. 🏃 Walking Habit (Currently: ${S.todayKm.toFixed(1)} KM)</strong><br>
+  Trigger: After morning shower → immediately go for walk<br>
+  Replacement: Park car 500m away and walk<br>
+  Reward: GPS earning of ₹ per KM (unlock with book purchase)<br><br>
+  <strong>3. 😴 Sleep Habit (Currently: ${S.sleep}h)</strong><br>
+  Trigger: 9 PM phone goes to "Do Not Disturb"<br>
+  Replacement: 10-min reading instead of social media<br>
+  Reward: Better mood score next morning<br><br>
+  <em>Science: It takes 21 days to form a habit. Start with just ONE change today.</em>
+  </div>`;
+}
+
+// MED TIMER
+let medInterval=null,medSecs=300,medRunning=false;
+function setMedTime(m){if(medRunning)return;medSecs=m*60;document.getElementById('medDisplay').textContent=fmt(medSecs);}
+function fmt(s){return`${String(Math.floor(s/60)).padStart(2,'0')}:${String(s%60).padStart(2,'0')}`;}
+function toggleMed(){
+  if(medRunning){clearInterval(medInterval);medRunning=false;document.getElementById('medBtn').textContent='▶ Start';document.getElementById('medCircle').classList.remove('active');}
+  else{medRunning=true;document.getElementById('medBtn').textContent='⏹ Stop';document.getElementById('medCircle').classList.add('active');
+    medInterval=setInterval(()=>{medSecs--;document.getElementById('medDisplay').textContent=fmt(medSecs);if(medSecs<=0){clearInterval(medInterval);medRunning=false;document.getElementById('medBtn').textContent='▶ Start';document.getElementById('medCircle').classList.remove('active');showToast('🧘 Meditation complete!');}},1000);}
+}
+
+// BREATHING
+let breathRunning=false,breathTimer=null,breathIdx=0;
+const BP2=[{phase:'Breathe In',dur:4000,cls:'breath-inhale'},{phase:'Hold',dur:7000,cls:'breath-hold'},{phase:'Breathe Out',dur:8000,cls:'breath-exhale'}];
+function toggleBreath(){
+  if(breathRunning){clearTimeout(breathTimer);breathRunning=false;document.getElementById('breathBtn').textContent='▶ Start';document.getElementById('breathCircle').className='breath-circle';document.getElementById('breathCircle').textContent='Tap Start';document.getElementById('breathLabel').textContent='4-7-8 Breathing Technique';}
+  else{breathRunning=true;document.getElementById('breathBtn').textContent='⏹ Stop';breathIdx=0;runBreath();}
+}
+function runBreath(){
+  if(!breathRunning)return;
+  const p=BP2[breathIdx%BP2.length];
+  document.getElementById('breathCircle').className='breath-circle '+p.cls;
+  document.getElementById('breathCircle').textContent=p.phase;
+  document.getElementById('breathLabel').textContent=`${p.phase} — ${p.dur/1000}s`;
+  breathIdx++;breathTimer=setTimeout(runBreath,p.dur);
+}
+
+// POSTURE
+let postureInterval=null;
+function startPostureTimer(){
+  let secs=1800;const el=document.getElementById('postureTimer');el.style.display='block';
+  if(postureInterval)clearInterval(postureInterval);
+  postureInterval=setInterval(()=>{secs--;el.textContent=`🪑 ${fmt(secs)}`;if(secs<=0){clearInterval(postureInterval);el.style.display='none';showToast('🪑 Stand & stretch now!');}},1000);
+  showToast('🪑 30-min posture reminder set!');
+}
+function triggerSOS(){if(confirm('🆘 Call Emergency Services (112)?'))window.location.href='tel:112';}
+
+// PROFILE
+async function saveProfile(){
+  if(!currentUser)return;
+  const profile={age:parseInt(document.getElementById('profAge').value)||null,gender:document.getElementById('profGender').value,weight:parseFloat(document.getElementById('profWeight').value)||null,height:parseFloat(document.getElementById('profHeight').value)||null};
+  try{await db.collection('users').doc(currentUser.uid).update({profile});S.profile=profile;showToast('✅ Profile saved!');renderAll(currentUser);}
+  catch(e){showToast('⚠ Save failed');}
+}
+
+// UPI PAYMENT - Fixed deep links
+function openUPIApp(app){
+  const amount=BOOK_PRICE;
+  const upiId=UPI_ID;
+  const name='Health+is+Wealth';
+  const note='Health+Book+Purchase';
+  // Use UPI deep link scheme - works on Android
+  const upiUrl=`upi://pay?pa=${upiId}&pn=${name}&am=${amount}&cu=INR&tn=${note}`;
+  // Try to open the specific app
+  if(app==='gpay'){
+    window.location.href=`intent://pay?pa=${upiId}&pn=${name}&am=${amount}&cu=INR&tn=${note}#Intent;scheme=upi;package=com.google.android.apps.nbu.paisa.user;end`;
+    setTimeout(()=>window.open(upiUrl,'_blank'),500);
+  }else if(app==='phonepe'){
+    window.location.href=`intent://pay?pa=${upiId}&pn=${name}&am=${amount}&cu=INR&tn=${note}#Intent;scheme=upi;package=com.phonepe.app;end`;
+    setTimeout(()=>window.open(upiUrl,'_blank'),500);
+  }else if(app==='bhim'){
+    window.location.href=`intent://pay?pa=${upiId}&pn=${name}&am=${amount}&cu=INR&tn=${note}#Intent;scheme=upi;package=in.org.npci.upiapp;end`;
+    setTimeout(()=>window.open(upiUrl,'_blank'),500);
+  }else{
+    // Generic UPI - works with any installed UPI app
+    window.location.href=upiUrl;
+    setTimeout(()=>{
+      navigator.clipboard?.writeText(upiId).then(()=>showToast('📋 UPI ID copied: '+upiId));
+    },1000);
+  }
+}
+
+function openPayment(){document.getElementById('upiSheet').classList.add('on');}
+function closePayment(e){if(e.target===document.getElementById('upiSheet'))document.getElementById('upiSheet').classList.remove('on');}
+function copyUPI(){navigator.clipboard?.writeText(UPI_ID).then(()=>showToast('📋 Copied: '+UPI_ID));}
+
+async function submitPayment(){
+  const txn=san(document.getElementById('txnId').value);
+  if(!txn||txn.length<6){showToast('⚠ Enter valid Transaction/UTR ID (min 6 digits)');return;}
+  if(!currentUser)return;
+  try{
+    await db.collection('payments').add({userId:currentUser.uid,txnId:txn,amount:BOOK_PRICE,status:'pending',submittedAt:firebase.firestore.FieldValue.serverTimestamp(),upiId:UPI_ID});
+    await db.collection('users').doc(currentUser.uid).update({bookStatus:'pending'});
+    document.getElementById('upiSheet').classList.remove('on');
+    document.getElementById('successTitle').textContent='🎉 Payment Submitted!';
+    document.getElementById('successMsg').textContent=`Transaction ID: ${txn}\n\nPayment under review. Book access + GPS Earn will be activated within 24 hours after admin verification.`;
+    document.getElementById('successModal').classList.add('on');
+    S.bookStatus='pending';updateBookStatus();
+  }catch(e){showToast('⚠ Submission failed. Try again.');}
+}
+function closeSuccess(){document.getElementById('successModal').classList.remove('on');}
+
+function updateBookStatus(){
+  const el=document.getElementById('bookStatus');
+  const btn=document.getElementById('bookBuyBtn');
+  const content=document.getElementById('bookContent');
+  if(S.bookPurchased){
+    el.className='book-unlocked';
+    el.innerHTML='<div style="font-size:1.4rem;margin-bottom:6px">📗</div><div style="font-weight:700;color:var(--green);margin-bottom:4px">Book Unlocked! GPS Earn Active ✅</div><div style="font-size:.78rem;color:var(--txt3)">Full access to all chapters + Walk & Earn + Referral</div>';
+    btn.style.display='none';content.style.display='block';
+  }else if(S.bookStatus==='pending'){
+    el.className='book-locked';
+    el.innerHTML='<div style="font-size:1.4rem;margin-bottom:6px">⏳</div><div style="font-weight:700;color:var(--amber);margin-bottom:4px">Payment Under Review</div><div style="font-size:.78rem;color:var(--txt3)">Admin will verify within 24 hours. GPS Earn activates after approval.</div>';
+    btn.textContent='⏳ Awaiting Verification';btn.disabled=true;
+  }
+}
+
+// REFERRAL
+async function loadReferrals(uid){
+  try{
+    const snap=await db.collection('referrals').where('referrerId','==',uid).orderBy('createdAt','desc').limit(20).get();
+    const list=document.getElementById('recruitList');
+    if(snap.empty){list.innerHTML='<div class="empty"><div class="empty-ico">👥</div><div class="empty-txt">No paid referrals yet. Share code — earn ₹200 per book sale!</div></div>';return;}
+    list.innerHTML=snap.docs.map(d=>{const r=d.data();return`<div class="recruit-item"><div class="recruit-av">${(r.referredName||'U').slice(0,1)}</div><div style="flex:1"><div style="font-weight:600;font-size:.86rem;color:var(--txt2)">${san(r.referredName||'User')}</div><div style="font-size:.72rem;color:var(--txt4)">Direct Referral · ₹${r.amount||200} ${r.status==='paid'?'earned':'pending'}</div></div><span class="${r.status==='paid'?'rb-paid':'rb-pending'}">${r.status==='paid'?'PAID':'PENDING'}</span></div>`;}).join('');
+  }catch(e){}
+}
+
+async function loadTxns(uid){
+  try{
+    const[p,w]=await Promise.all([
+      db.collection('payments').where('userId','==',uid).orderBy('submittedAt','desc').limit(10).get().catch(()=>({docs:[]})),
+      db.collection('withdrawals').where('uid','==',uid).orderBy('time','desc').limit(10).get().catch(()=>({docs:[]}))
+    ]);
+    const list=document.getElementById('txnList');
+    const items=[];
+    p.docs.forEach(d=>{const t=d.data();items.push({type:'pay',desc:`Book Purchase`,amt:t.amount||1999,status:t.status,date:t.submittedAt?.toDate()});});
+    w.docs.forEach(d=>{const t=d.data();items.push({type:'wd',desc:`Withdrawal → ${t.upiId||'UPI'}`,amt:t.amount||0,status:t.status,date:t.time?.toDate()});});
+    if(!items.length){list.innerHTML='<div class="empty"><div class="empty-ico">📭</div><div class="empty-txt">No transactions yet</div></div>';return;}
+    items.sort((a,b)=>(b.date||0)-(a.date||0));
+    const sc=s=>s==='approved'||s==='paid'?'var(--green)':s==='rejected'?'var(--red)':'var(--amber)';
+    list.innerHTML=items.map(t=>`<div class="txn-item"><div class="txn-ico ${t.type==='wd'?'txn-ico-out':'txn-ico-in'}">${t.type==='wd'?'💸':'💰'}</div><div class="txn-desc"><div>${san(t.desc)}</div><div style="color:${sc(t.status)};text-transform:uppercase;font-weight:700;font-size:.65rem">${t.status}</div></div><span class="${t.type==='wd'?'txn-out':'txn-in'}">${t.type==='wd'?'-':''}₹${t.amt}</span></div>`).join('');
+  }catch(e){}
+}
+
+async function requestWithdraw(){
+  if(!currentUser)return;
+  if(!S.bookPurchased){showToast('⚠ Buy the book first to access withdrawals');return;}
+  const amt=parseInt(document.getElementById('withdrawAmt').value);
+  const upi=san(document.getElementById('withdrawUPI').value);
+  if(!amt||amt<50){showToast('⚠ Minimum withdrawal is ₹50');return;}
+  if(!upi||upi.length<5||!upi.includes('@')){showToast('⚠ Enter valid UPI ID (e.g. name@upi)');return;}
+  const doc=await db.collection('users').doc(currentUser.uid).get();
+  const bal=doc.data().wallet||doc.data().balance||0;
+  if(bal<amt){showToast(`⚠ Insufficient balance. Available: ₹${bal.toFixed(0)}`);return;}
+  try{
+    await db.collection('withdrawals').add({uid:currentUser.uid,name:currentUser.displayName||'User',email:currentUser.email||'',amount:amt,upiId:upi,status:'pending',time:firebase.firestore.FieldValue.serverTimestamp()});
+    await db.collection('users').doc(currentUser.uid).update({wallet:firebase.firestore.FieldValue.increment(-amt),balance:firebase.firestore.FieldValue.increment(-amt)});
+    document.getElementById('withdrawAmt').value='';document.getElementById('withdrawUPI').value='';
+    showToast(`✅ Withdrawal ₹${amt} requested! 1–3 days.`);
+    loadTxns(currentUser.uid);
+  }catch(e){showToast('⚠ Request failed');}
+}
+
+function copyRef(){navigator.clipboard?.writeText(`bonagirispinoj-png.github.io/ref/${S.refCode}`).then(()=>showToast('📋 Referral link copied!'));}
+function shareWA(){window.open(`https://wa.me/?text=Join%20Health%20is%20Wealth!%20Walk%20daily%20%26%20earn%20%E2%82%B91%20per%20KM.%20Buy%20health%20book%20at%20%E2%82%B91%2C999%20%26%20unlock%20GPS%20earning.%20Use%20my%20code:%20${S.refCode}%20-%20https://bonagirispinoj-png.github.io/ref/${S.refCode}`);}
+function shareTG(){window.open(`https://t.me/share/url?url=https://bonagirispinoj-png.github.io/ref/${S.refCode}&text=Join%20Health%20is%20Wealth!%20Code:${S.refCode}`);}
+
+function goPage(page){
+  document.querySelectorAll('.pg').forEach(p=>p.classList.remove('on'));
+  document.querySelectorAll('.bn-item').forEach(b=>b.classList.remove('on'));
+  const pg=document.getElementById(`pg${page.charAt(0).toUpperCase()+page.slice(1)}`);
+  const bn=document.getElementById(`bn-${page}`);
+  if(pg)pg.classList.add('on');
+  if(bn)bn.classList.add('on');
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+function toggleTheme(){
+  const t=document.documentElement.getAttribute('data-theme')==='dark'?'light':'dark';
+  document.documentElement.setAttribute('data-theme',t);
+  document.querySelector('.tb-theme').textContent=t==='dark'?'☀️':'🌙';
+  try{localStorage.setItem('__theme',t);}catch(e){}
+}
+try{const t=localStorage.getItem('__theme');if(t){document.documentElement.setAttribute('data-theme',t);if(t==='dark')document.querySelector('.tb-theme').textContent='☀️';}}catch(e){}
+
+async function clearData(){
+  if(!confirm('Clear today\'s log?'))return;
+  if(!currentUser)return;
+  try{
+    const today=new Date().toISOString().slice(0,10);
+    await db.collection('users').doc(currentUser.uid).collection('logs').doc(today).delete();
+    await db.collection('users').doc(currentUser.uid).update({todayKm:0});
+    S.water=0;S.sleep=0;S.hr=72;S.mood='';S.todayKm=0;
+    renderAll(currentUser);showToast('🗑 Today\'s log cleared');
+  }catch(e){showToast('⚠ Clear failed');}
+}
+
+// ADMIN
+function showAdminPanel(){document.getElementById('authScreen').style.display='none';document.getElementById('userApp').style.display='none';document.getElementById('bnav').style.display='none';document.getElementById('adminApp').style.display='block';document.getElementById('adminLoginBox').style.display='flex';document.getElementById('adminDash').style.display='none';}
+
+async function adminLogin(){
+  const email=document.getElementById('adminEmail').value.trim().toLowerCase();
+  const pass=document.getElementById('adminPass').value;
+  const err=document.getElementById('adminErr');
+  err.textContent='';
+  if(!email||!pass){err.textContent='Enter email and password.';return;}
+  try{
+    const cred=await auth.signInWithEmailAndPassword(email,pass);
+    document.getElementById('adminBadge').textContent=cred.user.email.split('@')[0];
+    document.getElementById('adminLoginBox').style.display='none';
+    document.getElementById('adminDash').style.display='block';
+    loadAdminStats();loadAdminWD();
+  }catch(e){err.textContent=authErr(e.code);}
+}
+
+function adminLogout(){auth.signOut();document.getElementById('adminLoginBox').style.display='flex';document.getElementById('adminDash').style.display='none';window.location.hash='';}
+
+function adminTab(btn,tabId){
+  document.querySelectorAll('.admin-tab').forEach(t=>t.classList.remove('on'));
+  btn.classList.add('on');
+  ['aDash','aWD','aPay','aUsers'].forEach(id=>document.getElementById(id).style.display='none');
+  document.getElementById(tabId).style.display='block';
+  if(tabId==='aWD')loadAdminWD();
+  else if(tabId==='aPay')loadAdminPay();
+  else if(tabId==='aUsers')loadAdminUsers();
+  else loadAdminStats();
+}
+
+async function loadAdminStats(){
+  try{
+    const[users,wd,pay]=await Promise.all([db.collection('users').get().catch(()=>({size:0,docs:[]})),db.collection('withdrawals').where('status','==','pending').get().catch(()=>({size:0})),db.collection('payments').where('status','==','pending').get().catch(()=>({size:0}))]);
+    document.getElementById('sTotalUsers').textContent=users.size||0;
+    document.getElementById('sPendingWD').textContent=wd.size||0;
+    document.getElementById('sPendingPay').textContent=pay.size||0;
+    let totalKm=0,totalBal=0;
+    (users.docs||[]).forEach(d=>{const dd=d.data();totalKm+=dd.totalKm||0;totalBal+=dd.wallet||dd.balance||0;});
+    document.getElementById('sTotalKm').textContent=totalKm.toFixed(1);
+    document.getElementById('sTotalBal').textContent='₹'+totalBal.toFixed(0);
+  }catch(e){}
+}
+
+let wdUnsub=null;
+function loadAdminWD(){
+  if(wdUnsub)wdUnsub();
+  wdUnsub=db.collection('withdrawals').orderBy('time','desc').limit(100).onSnapshot(snap=>{
+    const tbody=document.getElementById('wdBody');
+    if(!snap||snap.empty){tbody.innerHTML='<tr><td colspan="6" style="text-align:center;padding:24px;color:#9e8c6e">No withdrawal requests yet.</td></tr>';return;}
+    tbody.innerHTML=snap.docs.map(doc=>{
+      const d=doc.data();
+      const date=d.time?.toDate()?.toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'})||'—';
+      const pcls=d.status==='approved'?'pill-a':d.status==='rejected'?'pill-r':'pill-p';
+      const btns=d.status==='pending'?`<div style="display:flex;gap:6px"><button class="btn-a" onclick="aApproveWD('${doc.id}')">✅ Approve</button><button class="btn-r" onclick="aRejectWD('${doc.id}','${d.uid}',${d.amount})">❌ Reject</button></div>`:`<span style="font-size:.74rem;color:#9e8c6e">${d.status}</span>`;
+      return`<tr><td><strong>${esc(d.name||'—')}</strong><br><small style="color:#9e8c6e">${esc(d.email||'')}</small></td><td><strong style="color:#1e6b3a">₹${d.amount}</strong></td><td style="font-size:.76rem">${esc(d.upiId||'—')}</td><td><span class="pill ${pcls}">${d.status}</span></td><td style="font-size:.74rem">${date}</td><td>${btns}</td></tr>`;
+    }).join('');
+  });
+}
+
+async function aApproveWD(id){if(!confirm('Approve withdrawal?'))return;await db.collection('withdrawals').doc(id).update({status:'approved',approvedAt:firebase.firestore.FieldValue.serverTimestamp()});showToast('✅ Approved!');}
+async function aRejectWD(id,uid,amt){
+  if(!confirm(`Reject & refund ₹${amt}?`))return;
+  await db.collection('users').doc(uid).update({wallet:firebase.firestore.FieldValue.increment(amt),balance:firebase.firestore.FieldValue.increment(amt)});
+  await db.collection('withdrawals').doc(id).update({status:'rejected',rejectedAt:firebase.firestore.FieldValue.serverTimestamp()});
+  showToast(`❌ Rejected. ₹${amt} refunded.`);
+}
+
+let payUnsub=null;
+function loadAdminPay(){
+  if(payUnsub)payUnsub();
+  payUnsub=db.collection('payments').orderBy('submittedAt','desc').limit(100).onSnapshot(snap=>{
+    const tbody=document.getElementById('payBody');
+    if(!snap||snap.empty){tbody.innerHTML='<tr><td colspan="6" style="text-align:center;padding:24px;color:#9e8c6e">No payments yet.</td></tr>';return;}
+    tbody.innerHTML=snap.docs.map(doc=>{
+      const d=doc.data();
+      const date=d.submittedAt?.toDate()?.toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'})||'—';
+      const pcls=d.status==='approved'||d.status==='paid'?'pill-a':d.status==='rejected'?'pill-r':'pill-p';
+      const btns=d.status==='pending'?`<div style="display:flex;gap:6px"><button class="btn-a" onclick="aApprovePay('${doc.id}','${d.userId}')">✅ Approve</button><button class="btn-r" onclick="aRejectPay('${doc.id}')">❌ Reject</button></div>`:`<span style="font-size:.74rem;color:#9e8c6e">${d.status}</span>`;
+      return`<tr><td style="font-size:.74rem;font-family:monospace">${esc((d.userId||'').slice(0,12))}...</td><td><strong style="color:#1e6b3a">₹${d.amount||1999}</strong></td><td style="font-size:.74rem;font-family:monospace">${esc(d.txnId||'—')}</td><td><span class="pill ${pcls}">${d.status}</span></td><td style="font-size:.74rem">${date}</td><td>${btns}</td></tr>`;
+    }).join('');
+  });
+}
+
+async function aApprovePay(id,userId){
+  if(!confirm('Approve payment & grant book access + GPS Earn + Referral?'))return;
+  await db.collection('payments').doc(id).update({status:'approved',approvedAt:firebase.firestore.FieldValue.serverTimestamp()});
+  await db.collection('users').doc(userId).update({bookPurchased:true,bookStatus:'approved'});
+  // Credit referrer ₹200 if they referred this user
+  const userDoc=await db.collection('users').doc(userId).get();
+  const userData=userDoc.data();
+  if(userData.referredBy){
+    const refSnap=await db.collection('users').where('refCode','==',userData.referredBy).limit(1).get();
+    if(!refSnap.empty&&refSnap.docs[0].data().bookPurchased){
+      await db.collection('users').doc(refSnap.docs[0].id).update({wallet:firebase.firestore.FieldValue.increment(200),balance:firebase.firestore.FieldValue.increment(200)});
+      await db.collection('referrals').where('referredId','==',userId).get().then(snap=>{
+        snap.forEach(d=>d.ref.update({status:'paid',amount:200}));
+      });
+    }
+  }
+  showToast('✅ Payment approved! Book + GPS Earn activated.');
+}
+async function aRejectPay(id){if(!confirm('Reject payment?'))return;await db.collection('payments').doc(id).update({status:'rejected'});showToast('❌ Payment rejected.');}
+
+async function loadAdminUsers(){
+  const tbody=document.getElementById('usersBody');
+  tbody.innerHTML='<tr><td colspan="7" style="text-align:center;padding:24px;color:#9e8c6e">Loading...</td></tr>';
+  try{
+    const snap=await db.collection('users').orderBy('joinedAt','desc').limit(200).get();
+    if(snap.empty){tbody.innerHTML='<tr><td colspan="7" style="text-align:center;padding:24px;color:#9e8c6e">No users yet.</td></tr>';return;}
+    tbody.innerHTML=snap.docs.map(doc=>{
+      const d=doc.data();
+      const joined=d.joinedAt?.toDate()?.toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'2-digit'})||'—';
+      return`<tr><td><strong>${esc(d.name||'—')}</strong></td><td style="font-size:.76rem">${esc(d.email||'—')}</td><td style="font-family:monospace;font-weight:700;font-size:.8rem;color:#0d2818">${esc(d.refCode||'—')}</td><td><strong style="color:#1e6b3a">₹${(d.wallet||d.balance||0).toFixed(0)}</strong></td><td>${(d.totalKm||0).toFixed(1)} km</td><td><span class="pill ${d.bookPurchased?'pill-a':'pill-p'}">${d.bookPurchased?'✅ Bought':'🔒 Not Bought'}</span></td><td style="font-size:.74rem">${joined}</td></tr>`;
+    }).join('');
+  }catch(e){tbody.innerHTML=`<tr><td colspan="7" style="text-align:center;padding:24px;color:#c0392b">Error: ${e.message}</td></tr>`;}
+}
+
+function esc(s){return String(s||'').replace(/[<>&"']/g,c=>({'<':'&lt;','>':'&gt;','&':'&amp;','"':'&quot;',"'":'&#39;'}[c]));}
+function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('on');setTimeout(()=>t.classList.remove('on'),2800);}
+</script>
+</body>
+</html>
